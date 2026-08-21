@@ -1,0 +1,70 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0f0f17;
+  color: #e2e8f0;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Páginas com canvas (organograma) precisam de altura fixa e sem scroll */
+.page-canvas {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* React Flow overrides */
+.react-flow__background {
+  background: #0f0f17;
+}
+
+.react-flow__edge-path {
+  stroke: #6366f1;
+  stroke-width: 2;
+}
+
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:focus .react-flow__edge-path {
+  stroke: #fff !important;
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 6px #6366f1);
+}
+
+.react-flow__edge.animated path {
+  stroke-dasharray: 5;
+  animation: dashdraw 0.5s linear infinite;
+}
+
+@keyframes dashdraw {
+  to { stroke-dashoffset: -10; }
+}
+
+.react-flow__controls {
+  background: #1e1e2e;
+  border: 1px solid #2d2d44;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+.react-flow__controls-button {
+  background: #1e1e2e;
+  border-bottom: 1px solid #2d2d44;
+  fill: #a0aec0;
+}
+
+.react-flow__controls-button:hover {
+  background: #2d2d44;
+  fill: #e2e8f0;
+}
+
+.react-flow__minimap {
+  background: #1e1e2e;
+  border: 1px solid #2d2d44;
+  border-radius: 12px;
+}
