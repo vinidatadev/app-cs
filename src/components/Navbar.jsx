@@ -1,10 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 
 const FLOWCHECK_URL = import.meta.env.VITE_FLOWCHECK_URL || 'http://localhost:5174'
 
 export default function Navbar() {
   const { user, perm, isAdmin, logout } = useAuth()
+  const { theme, toggle } = useTheme()
 
   const initials = (user?.nome_usuario || '?')
     .split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
@@ -83,6 +85,21 @@ export default function Navbar() {
         <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {user?.nome_usuario || user?.cargo || ''}
         </span>
+
+        <button
+          onClick={toggle}
+          title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+          style={{
+            background: 'none', border: '1px solid var(--border)',
+            borderRadius: 8, padding: '4px 10px',
+            color: 'var(--text4)', fontSize: 14,
+            cursor: 'pointer', transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text4)' }}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
 
         <button
           onClick={logout}

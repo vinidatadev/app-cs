@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import App from './App'
 import Login from './pages/Login'
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
+        <ThemeProvider>
         <Routes>
           <Route path="/" element={<Navigate to="/organograma" replace />} />
           <Route path="/login" element={<Login />} />
@@ -51,6 +53,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             </ProtectedRoute>
           } />
         </Routes>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
