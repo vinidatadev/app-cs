@@ -122,7 +122,7 @@ export default function AdminUsuarios() {
                 <div key={u.id} style={{
                   display: 'grid', gridTemplateColumns: '1fr 120px 120px 120px 80px 80px',
                   gap: 12, alignItems: 'center',
-                  background: 'var(--bg2)', border: `1px solid ${isNivel2 ? '#6366f133' : '#2d2d44'}`,
+                  background: 'var(--bg2)', border: `1px solid ${isNivel2 ? '#6366f133' : 'var(--border)'}`,
                   borderRadius: 14, padding: '14px 20px',
                 }}>
 
@@ -170,7 +170,7 @@ export default function AdminUsuarios() {
                       disabled={isNivel2 || !u.id_user}
                       style={{
                         width: 36, height: 20, borderRadius: 10,
-                        background: (isNivel2 || perm.links) ? '#6366f1' : '#2d2d44',
+                        background: (isNivel2 || perm.links) ? '#6366f1' : 'var(--border)',
                         border: 'none', cursor: isNivel2 || !u.id_user ? 'default' : 'pointer',
                         position: 'relative', transition: 'background 0.2s', flexShrink: 0,
                       }}
@@ -223,7 +223,7 @@ function PermSelect({ value, disabled, onChange }) {
       onChange={e => onChange(e.target.value)}
       style={{
         background: disabled ? '#0f0f17' : `${color}15`,
-        border: `1px solid ${disabled ? '#2d2d44' : color + '55'}`,
+        border: `1px solid ${disabled ? 'var(--border)' : color + '55'}`,
         borderRadius: 8, padding: '5px 8px',
         color: disabled ? '#475569' : color,
         fontSize: 12, fontWeight: 700, cursor: disabled ? 'default' : 'pointer',

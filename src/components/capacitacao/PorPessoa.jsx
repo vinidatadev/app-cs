@@ -36,8 +36,8 @@ export default function PorPessoa({ users, cursos, progressos, onSetStatus, onAd
               <button key={u.id} onClick={() => setSelecionado(selected ? null : u)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  background: selected ? '#6366f115' : '#161622',
-                  border: `1px solid ${selected ? '#6366f155' : '#2d2d44'}`,
+                  background: selected ? '#6366f115' : 'var(--bg2)',
+                  border: `1px solid ${selected ? '#6366f155' : 'var(--border)'}`,
                   borderRadius: 14, padding: '12px 16px', cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif', textAlign: 'left', transition: 'all 0.15s',
                 }}
@@ -46,9 +46,8 @@ export default function PorPessoa({ users, cursos, progressos, onSetStatus, onAd
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</div>
                   <div style={{ fontSize: 11, color: 'var(--text4)', marginBottom: 6 }}>{u.cargo || '—'}</div>
-                  {/* barra de progresso */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ flex: 1, height: 4, background: '#2d2d44', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ flex: 1, height: 4, background: 'var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ width: `${stats.pct}%`, height: '100%', background: stats.pct === 100 ? '#22c55e' : '#6366f1', borderRadius: 4, transition: 'width 0.4s' }} />
                     </div>
                     <span style={{ fontSize: 11, color: stats.pct === 100 ? '#22c55e' : '#6366f1', fontWeight: 700, minWidth: 32 }}>{stats.pct}%</span>
@@ -56,7 +55,7 @@ export default function PorPessoa({ users, cursos, progressos, onSetStatus, onAd
                   <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                     <StatusPill label={`✓ ${stats.concluidos}`} color="#22c55e" />
                     <StatusPill label={`▶ ${stats.iniciados}`} color="#f97316" />
-                    <StatusPill label={`${stats.total - stats.concluidos - stats.iniciados} pendentes`} color="#475569" />
+                    <StatusPill label={`${stats.total - stats.concluidos - stats.iniciados} pendentes`} color="var(--text5)" />
                   </div>
                 </div>
               </button>

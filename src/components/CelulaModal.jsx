@@ -116,7 +116,7 @@ export default function CelulaModal({ celula, users, onClose, onSave }) {
                   <button key={u.id} onClick={() => toggleMembro(u.id)} style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     background: ativo ? `${form.cor}18` : '#0f0f17',
-                    border: `1px solid ${ativo ? form.cor + '66' : '#2d2d44'}`,
+                    border: `1px solid ${ativo ? form.cor + '66' : 'var(--border)'}`,
                     borderRadius: 10, padding: '8px 14px', cursor: 'pointer',
                     fontFamily: 'Inter, sans-serif', transition: 'all 0.15s',
                   }}>

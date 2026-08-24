@@ -70,7 +70,7 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
 
         {/* Barra de progresso */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ flex: 1, height: 8, background: '#2d2d44', borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ flex: 1, height: 8, background: 'var(--border)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{ width: `${pct}%`, height: '100%', background: pct === 100 ? '#22c55e' : 'linear-gradient(90deg,#6366f1,#a855f7)', borderRadius: 8, transition: 'width 0.5s' }} />
           </div>
           <span style={{ fontSize: 18, fontWeight: 800, color: pct === 100 ? '#22c55e' : '#6366f1', minWidth: 44 }}>{pct}%</span>
@@ -103,7 +103,7 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
                 transition: 'border-color 0.15s',
               }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f155'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = '#2d2d44'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
               >
                 <span style={{ fontSize: 12, color: 'var(--text)', textAlign: 'left' }}>{c.curso}</span>
                 <span style={{ fontSize: 10, color: '#6366f1', fontWeight: 700, marginLeft: 8, flexShrink: 0 }}>+ atribuir</span>

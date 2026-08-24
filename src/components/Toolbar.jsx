@@ -16,7 +16,7 @@ export default function Toolbar({ onAutoLayout, onSaveLayout, onAtribuicoes, onM
         🏢 Organograma
       </span>
 
-      <div style={{ width: 1, height: 24, background: '#2d2d44' }} />
+      <div style={{ width: 1, height: 24, background: 'var(--border)' }} />
 
       {/* Toggle visão */}
       <div style={{
@@ -39,7 +39,7 @@ export default function Toolbar({ onAutoLayout, onSaveLayout, onAtribuicoes, onM
         </button>
       </div>
 
-      <div style={{ width: 1, height: 24, background: '#2d2d44' }} />
+      <div style={{ width: 1, height: 24, background: 'var(--border)' }} />
 
       {isHierarquia && canEdit && <>
         <button onClick={onAutoLayout} disabled={loading} style={btnStyle('#a855f7')}>

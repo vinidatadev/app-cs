@@ -93,7 +93,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
       zIndex: 100, overflowY: 'auto', padding: '48px 16px',
     }}>
       <div style={{
-        background: '#1a1a2e', border: '1px solid var(--border)', borderRadius: 24,
+        background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 24,
         width: '100%', maxWidth: 800, boxShadow: '0 32px 80px rgba(0,0,0,0.8)',
       }}>
 
@@ -161,7 +161,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                     padding: '8px 10px', margin: '-8px -10px',
                     border: '1px solid transparent', transition: 'all 0.15s',
                   }}
-                  onMouseEnter={canEdit ? e => { e.currentTarget.style.borderColor = '#2d2d44'; e.currentTarget.style.background = '#0f0f17' } : undefined}
+                  onMouseEnter={canEdit ? e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = '#0f0f17' } : undefined}
                   onMouseLeave={canEdit ? e => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent' } : undefined}
                 >
                   {transacao.descricao
@@ -225,7 +225,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                     padding: '10px 12px', cursor: canEdit ? 'pointer' : 'default', transition: 'border-color 0.15s',
                   }}
                   onMouseEnter={canEdit ? e => e.currentTarget.style.borderColor = '#6366f155' : undefined}
-                  onMouseLeave={canEdit ? e => e.currentTarget.style.borderColor = '#2d2d44' : undefined}
+                  onMouseLeave={canEdit ? e => e.currentTarget.style.borderColor = 'var(--border)' : undefined}
                 >
                   <Avatar user={pontoFocal} size={40} />
                   <div style={{ minWidth: 0 }}>
@@ -244,7 +244,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                     cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s',
                   }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f155'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = '#2d2d44'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
                 >
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--bg3)', border: '1px dashed #3d3d55', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>👤</div>
                   <span>Definir ponto focal</span>
@@ -323,7 +323,7 @@ function DetalheBlock({ detalhe, index, total, onDelete, onMove, onSaveTexto, ca
   return (
     <div
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ position: 'relative', background: 'var(--bg)', border: `1px solid ${editing ? '#6366f155' : '#2d2d44'}`, borderRadius: 14, overflow: 'hidden' }}
+      style={{ position: 'relative', background: 'var(--bg)', border: `1px solid ${editing ? '#6366f155' : 'var(--border)'}`, borderRadius: 14, overflow: 'hidden' }}
     >
       {detalhe.tipo === 'texto' ? (
         canEdit && editing ? (
@@ -342,7 +342,7 @@ function DetalheBlock({ detalhe, index, total, onDelete, onMove, onSaveTexto, ca
           </p>
         )
       ) : (
-        <img src={detalhe.conteudo} alt="detalhe" style={{ width: '100%', display: 'block', maxHeight: 480, objectFit: 'contain', background: '#0a0a12' }} />
+        <img src={detalhe.conteudo} alt="detalhe" style={{ width: '100%', display: 'block', maxHeight: 480, objectFit: 'contain', background: 'var(--bg)' }} />
       )}
 
       {canEdit && hovered && !editing && (

@@ -148,7 +148,7 @@ function Section({ titulo, subtitulo, icone, cor, links }) {
           <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text2)', letterSpacing: '-0.01em' }}>{titulo}</h2>
           <p style={{ fontSize: 12, color: 'var(--text5)', marginTop: 1 }}>{subtitulo}</p>
         </div>
-        <div style={{ flex: 1, height: 1, background: '#2d2d44', marginLeft: 8 }} />
+        <div style={{ flex: 1, height: 1, background: 'var(--border)', marginLeft: 8 }} />
         <span style={{ fontSize: 11, color: 'var(--text5)', fontWeight: 600 }}>{links.length} links</span>
       </div>
 
@@ -173,7 +173,7 @@ function LinkCard({ link }) {
       style={{
         display: 'flex', alignItems: 'flex-start', gap: 14,
         background: hovered ? '#1e1e2e' : '#161622',
-        border: `1px solid ${hovered ? link.cor + '55' : '#2d2d44'}`,
+        border: `1px solid ${hovered ? link.cor + '55' : 'var(--border)'}`,
         borderRadius: 16, padding: '16px 18px',
         textDecoration: 'none', cursor: 'pointer',
         transition: 'all 0.15s',
@@ -203,7 +203,7 @@ function LinkCard({ link }) {
 
       {/* Seta */}
       <div style={{
-        color: hovered ? link.cor : '#2d2d44',
+        color: hovered ? link.cor : 'var(--border)',
         fontSize: 16, flexShrink: 0, marginTop: 2,
         transition: 'color 0.15s, transform 0.15s',
         transform: hovered ? 'translate(2px, -2px)' : 'none',

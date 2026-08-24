@@ -48,7 +48,7 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
           {categorias.map(cat => (
             <button key={cat} onClick={() => setCategoriaFiltro(cat)} style={{
               background: categoriaFiltro === cat ? '#6366f1' : '#161622',
-              border: `1px solid ${categoriaFiltro === cat ? '#6366f1' : '#2d2d44'}`,
+              border: `1px solid ${categoriaFiltro === cat ? '#6366f1' : 'var(--border)'}`,
               color: categoriaFiltro === cat ? '#fff' : '#64748b',
               borderRadius: 20, padding: '5px 14px', fontSize: 11, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
@@ -66,7 +66,7 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
 
           return (
             <div key={curso.id} style={{
-              background: 'var(--bg2)', border: `1px solid ${isOpen ? '#6366f155' : '#2d2d44'}`,
+              background: 'var(--bg2)', border: `1px solid ${isOpen ? '#6366f155' : 'var(--border)'}`,
               borderRadius: 16, overflow: 'hidden', transition: 'border-color 0.15s',
             }}>
               {/* Card header */}
@@ -86,7 +86,7 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
                 </div>
 
                 {/* Barra de progresso */}
-                <div style={{ height: 6, background: '#2d2d44', borderRadius: 6, overflow: 'hidden', marginBottom: 10 }}>
+                <div style={{ height: 6, background: 'var(--border)', borderRadius: 6, overflow: 'hidden', marginBottom: 10 }}>
                   <div style={{ width: `${pct}%`, height: '100%', background: pct === 100 ? '#22c55e' : 'linear-gradient(90deg,#6366f1,#a855f7)', borderRadius: 6, transition: 'width 0.4s' }} />
                 </div>
 

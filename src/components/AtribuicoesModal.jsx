@@ -161,7 +161,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
                 <button key={u.id} onClick={() => { setUserSelecionado(u); setBusca(u.nome_usuario || '') }}
                   style={{
                     background: userSelecionado?.id === u.id ? '#6366f122' : 'transparent',
-                    border: `1px solid ${userSelecionado?.id === u.id ? '#6366f1' : '#2d2d44'}`,
+                    border: `1px solid ${userSelecionado?.id === u.id ? '#6366f1' : 'var(--border)'}`,
                     borderRadius: 10, padding: '8px 12px', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     fontFamily: 'Inter, sans-serif',
@@ -221,7 +221,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
                           border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                           borderBottom: '1px solid var(--border)',
                         }}
-                          onMouseEnter={e => e.currentTarget.style.background = '#2d2d44'}
+                          onMouseEnter={e => e.currentTarget.style.background = 'var(--border)'}
                           onMouseLeave={e => e.currentTarget.style.background = 'none'}
                         >
                           <span style={{ width: 10, height: 10, borderRadius: '50%', background: a.cor, flexShrink: 0 }} />

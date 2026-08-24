@@ -110,7 +110,7 @@ export default function Navbar() {
             transition: 'all 0.15s',
           }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = '#ef444444'; e.currentTarget.style.color = '#fca5a5' }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = '#2d2d44'; e.currentTarget.style.color = '#475569' }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = '#475569' }}
         >
           Sair
         </button>

@@ -99,7 +99,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
         {categorias.map(cat => (
           <button key={cat} onClick={() => setCatFiltro(cat)} style={{
             background: catFiltro === cat ? '#6366f1' : '#161622',
-            border: `1px solid ${catFiltro === cat ? '#6366f1' : '#2d2d44'}`,
+            border: `1px solid ${catFiltro === cat ? '#6366f1' : 'var(--border)'}`,
             color: catFiltro === cat ? '#fff' : '#64748b',
             borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 600,
             cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
@@ -126,7 +126,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
             display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px 100px',
             gap: 12, padding: '12px 16px', alignItems: 'center',
             background: curso.ativo ? '#161622' : '#0f0f17',
-            border: `1px solid ${curso.ativo ? '#2d2d44' : '#1a1a2e'}`,
+            border: `1px solid ${curso.ativo ? 'var(--border)' : '#1a1a2e'}`,
             borderRadius: 12, opacity: curso.ativo ? 1 : 0.5,
           }}>
             <div style={{ minWidth: 0 }}>
@@ -225,7 +225,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <button onClick={() => set('ativo', !form.ativo)} style={{
                   width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer',
-                  background: form.ativo ? '#6366f1' : '#2d2d44', position: 'relative', transition: 'background 0.2s',
+                  background: form.ativo ? '#6366f1' : 'var(--border)', position: 'relative', transition: 'background 0.2s',
                 }}>
                   <div style={{ position: 'absolute', top: 3, left: form.ativo ? 21 : 3, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
                 </button>

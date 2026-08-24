@@ -134,7 +134,7 @@ function UserRow({ user, inOrganograma, onAdd }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
-      background: 'var(--bg)', border: `1px solid ${inOrganograma ? '#2d2d44' : '#2d2d44'}`,
+      background: 'var(--bg)', border: `1px solid ${inOrganograma ? 'var(--border)' : 'var(--border)'}`,
       borderRadius: 12, padding: '10px 14px',
     }}>
       {/* Avatar */}

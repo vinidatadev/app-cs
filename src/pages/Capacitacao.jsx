@@ -84,7 +84,7 @@ export default function Capacitacao() {
             {setores.map(s => (
               <button key={s} onClick={() => setSetorFiltro(s)} style={{
                 background: setorFiltro === s ? '#6366f1' : '#161622',
-                border: `1px solid ${setorFiltro === s ? '#6366f1' : '#2d2d44'}`,
+                border: `1px solid ${setorFiltro === s ? '#6366f1' : 'var(--border)'}`,
                 color: setorFiltro === s ? '#fff' : '#64748b',
                 borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
