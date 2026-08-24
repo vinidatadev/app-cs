@@ -56,7 +56,7 @@ export default function CelulaNode({ data }) {
           </span>
         </div>
 
-        {hovered && (
+        {hovered && data.onEdit && (
           <button
             onClick={e => { e.stopPropagation(); data.onEdit(celula) }}
             style={{

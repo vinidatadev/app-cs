@@ -242,7 +242,7 @@ export default function App() {
       />
 
       {visao === 'celulas' ? (
-        <CelulaView users={users} />
+        <CelulaView users={users} canEdit={canEdit} />
       ) : (
         <>
           {loading && (
