@@ -32,8 +32,8 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
     return {
       concluido: entries.filter(p => p.status === 'concluido').length,
       iniciado:  entries.filter(p => p.status === 'iniciado').length,
-      pendente:  users.length - entries.filter(p => p.status !== 'pendente').length,
-      total:     users.length,
+      pendente:  entries.filter(p => p.status === 'pendente').length,
+      total:     entries.length, // só quem tem o curso atribuído
     }
   }
 
@@ -98,35 +98,43 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
                 </div>
               </button>
 
-              {/* Expandido: lista de pessoas */}
+              {/* Expandido: só pessoas com o curso atribuído */}
               {isOpen && (
                 <div style={{ borderTop: '1px solid #2d2d44', padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {users.map(u => {
-                    const prog = progressos.find(p => p.id_user === u.id && p.id_curso === curso.id)
-                    const status = prog?.status || 'pendente'
-                    const cfg = STATUS_CONFIG[status]
-                    const nextStatus = status === 'pendente' ? 'iniciado' : status === 'iniciado' ? 'concluido' : 'pendente'
-                    return (
-                      <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#6366f122', border: '1px solid #6366f133', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-                          {u.foto ? <img src={u.foto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 9, fontWeight: 700, color: '#6366f1' }}>{(u.nome_usuario || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}</span>}
+                  {progressos.filter(p => p.id_curso === curso.id).length === 0 && (
+                    <p style={{ fontSize: 12, color: '#475569', textAlign: 'center', padding: '8px 0', fontStyle: 'italic' }}>
+                      Nenhum colaborador com este curso atribuído
+                    </p>
+                  )}
+                  {users
+                    .filter(u => progressos.find(p => p.id_user === u.id && p.id_curso === curso.id))
+                    .map(u => {
+                      const prog = progressos.find(p => p.id_user === u.id && p.id_curso === curso.id)
+                      const status = prog?.status || 'pendente'
+                      const cfg = STATUS_CONFIG[status]
+                      const nextStatus = status === 'pendente' ? 'iniciado' : status === 'iniciado' ? 'concluido' : 'pendente'
+                      return (
+                        <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#6366f122', border: '1px solid #6366f133', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                            {u.foto ? <img src={u.foto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 9, fontWeight: 700, color: '#6366f1' }}>{(u.nome_usuario || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}</span>}
+                          </div>
+                          <span style={{ flex: 1, fontSize: 12, color: '#e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</span>
+                          <button
+                            onClick={onSetStatus ? () => onSetStatus(u.id, curso.id, nextStatus) : undefined}
+                            disabled={!onSetStatus}
+                            style={{
+                              background: `${cfg.color}22`, border: `1px solid ${cfg.color}55`, color: cfg.color,
+                              borderRadius: 20, padding: '2px 10px', fontSize: 10, fontWeight: 700,
+                              cursor: onSetStatus ? 'pointer' : 'default',
+                              fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
+                              opacity: onSetStatus ? 1 : 0.7,
+                            }}>
+                            {cfg.label}
+                          </button>
                         </div>
-                        <span style={{ flex: 1, fontSize: 12, color: '#e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</span>
-                        <button
-                          onClick={onSetStatus ? () => onSetStatus(u.id, curso.id, nextStatus) : undefined}
-                          disabled={!onSetStatus}
-                          style={{
-                            background: `${cfg.color}22`, border: `1px solid ${cfg.color}55`, color: cfg.color,
-                            borderRadius: 20, padding: '2px 10px', fontSize: 10, fontWeight: 700,
-                            cursor: onSetStatus ? 'pointer' : 'default',
-                            fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
-                            opacity: onSetStatus ? 1 : 0.7,
-                          }}>
-                          {cfg.label}
-                        </button>
-                      </div>
-                    )
-                  })}
+                      )
+                    })
+                  }
                 </div>
               )}
             </div>

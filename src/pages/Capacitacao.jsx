@@ -43,12 +43,24 @@ export default function Capacitacao() {
 
   async function setStatus(id_user, id_curso, status) {
     await supabase.from('user_curso').upsert({ id_user, id_curso, status }, { onConflict: 'id_user,id_curso' })
-    // atualiza local sem reload full
     setProgressos(prev => {
       const exists = prev.find(p => p.id_user === id_user && p.id_curso === id_curso)
       if (exists) return prev.map(p => p.id_user === id_user && p.id_curso === id_curso ? { ...p, status } : p)
       return [...prev, { id_user, id_curso, status }]
     })
+  }
+
+  async function addCurso(id_user, id_curso) {
+    await supabase.from('user_curso').upsert({ id_user, id_curso, status: 'pendente' }, { onConflict: 'id_user,id_curso' })
+    setProgressos(prev => {
+      if (prev.find(p => p.id_user === id_user && p.id_curso === id_curso)) return prev
+      return [...prev, { id_user, id_curso, status: 'pendente' }]
+    })
+  }
+
+  async function removeCurso(id_user, id_curso) {
+    await supabase.from('user_curso').delete().eq('id_user', id_user).eq('id_curso', id_curso)
+    setProgressos(prev => prev.filter(p => !(p.id_user === id_user && p.id_curso === id_curso)))
   }
 
   return (
@@ -101,7 +113,12 @@ export default function Capacitacao() {
         {loading ? (
           <div style={{ textAlign: 'center', color: '#6366f1', padding: 64, fontSize: 15 }}>Carregando...</div>
         ) : tab === 'pessoa' ? (
-          <CapacitacaoPorPessoa users={usersFiltrados} cursos={cursos} progressos={progressos} onSetStatus={canEdit ? setStatus : null} />
+          <CapacitacaoPorPessoa
+            users={usersFiltrados} cursos={cursos} progressos={progressos}
+            onSetStatus={canEdit ? setStatus : null}
+            onAddCurso={canEdit ? addCurso : null}
+            onRemoveCurso={canEdit ? removeCurso : null}
+          />
         ) : tab === 'curso' ? (
           <CapacitacaoPorCurso users={usersFiltrados} cursos={cursos} progressos={progressos} onSetStatus={canEdit ? setStatus : null} />
         ) : canEdit ? (

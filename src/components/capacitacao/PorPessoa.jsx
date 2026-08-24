@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ProgressoUser from './ProgressoUser'
 
-export default function PorPessoa({ users, cursos, progressos, onSetStatus }) {
+export default function PorPessoa({ users, cursos, progressos, onSetStatus, onAddCurso, onRemoveCurso }) {
   const [selecionado, setSelecionado] = useState(null)
   const [busca, setBusca] = useState('')
 
@@ -14,7 +14,7 @@ export default function PorPessoa({ users, cursos, progressos, onSetStatus }) {
     const userP = progressos.filter(p => p.id_user === userId)
     const concluidos = userP.filter(p => p.status === 'concluido').length
     const iniciados = userP.filter(p => p.status === 'iniciado').length
-    const total = cursos.length
+    const total = userP.length  // só conta cursos atribuídos
     return { concluidos, iniciados, total, pct: total > 0 ? Math.round((concluidos / total) * 100) : 0 }
   }
 
@@ -72,6 +72,8 @@ export default function PorPessoa({ users, cursos, progressos, onSetStatus }) {
           cursos={cursos}
           progressos={progressos.filter(p => p.id_user === selecionado.id)}
           onSetStatus={onSetStatus ? (id_curso, status) => onSetStatus(selecionado.id, id_curso, status) : null}
+          onAddCurso={onAddCurso ? (id_curso) => onAddCurso(selecionado.id, id_curso) : null}
+          onRemoveCurso={onRemoveCurso ? (id_curso) => onRemoveCurso(selecionado.id, id_curso) : null}
           onClose={() => setSelecionado(null)}
         />
       )}
