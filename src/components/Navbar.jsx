@@ -20,20 +20,11 @@ export default function Navbar() {
         🏢 Painel
       </span>
 
-      {perm.canView('organograma') && (
-        <NavLink to="/organograma" style={navLinkStyle}>Organograma</NavLink>
-      )}
-      {perm.canView('transacoes') && (
-        <NavLink to="/transacoes" style={navLinkStyle}>Transações</NavLink>
-      )}
-      {perm.canView('capacitacao') && (
-        <NavLink to="/capacitacao" style={navLinkStyle}>Capacitação</NavLink>
-      )}
       {perm.canView('links') && (
         <NavLink to="/links" style={navLinkStyle}>Links</NavLink>
       )}
-      {isAdmin && (
-        <NavLink to="/admin" style={navLinkStyle}>⚙ Admin</NavLink>
+      {perm.canView('transacoes') && (
+        <NavLink to="/transacoes" style={navLinkStyle}>Transações</NavLink>
       )}
 
       {/* FlowCheck — link externo */}
@@ -61,6 +52,16 @@ export default function Navbar() {
       >
         FlowCheck ↗
       </a>
+
+      {perm.canView('capacitacao') && (
+        <NavLink to="/capacitacao" style={navLinkStyle}>Capacitação</NavLink>
+      )}
+      {perm.canView('organograma') && (
+        <NavLink to="/organograma" style={navLinkStyle}>Organograma</NavLink>
+      )}
+      {isAdmin && (
+        <NavLink to="/admin" style={navLinkStyle}>⚙ Admin</NavLink>
+      )}
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
