@@ -98,7 +98,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 20 }}>
         {categorias.map(cat => (
           <button key={cat} onClick={() => setCatFiltro(cat)} style={{
-            background: catFiltro === cat ? '#6366f1' : '#161622',
+            background: catFiltro === cat ? '#6366f1' : 'var(--bg2)',
             border: `1px solid ${catFiltro === cat ? '#6366f1' : 'var(--border)'}`,
             color: catFiltro === cat ? '#fff' : '#64748b',
             borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 600,
@@ -125,8 +125,8 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
           <div key={curso.id} style={{
             display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px 100px',
             gap: 12, padding: '12px 16px', alignItems: 'center',
-            background: curso.ativo ? '#161622' : '#0f0f17',
-            border: `1px solid ${curso.ativo ? 'var(--border)' : '#1a1a2e'}`,
+            background: curso.ativo ? 'var(--bg2)' : 'var(--bg)',
+            border: `1px solid ${curso.ativo ? 'var(--border)' : 'var(--bg3)'}`,
             borderRadius: 12, opacity: curso.ativo ? 1 : 0.5,
           }}>
             <div style={{ minWidth: 0 }}>

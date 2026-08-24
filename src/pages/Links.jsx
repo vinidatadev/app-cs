@@ -172,7 +172,7 @@ function LinkCard({ link }) {
       onMouseLeave={() => setHovered(false)}
       style={{
         display: 'flex', alignItems: 'flex-start', gap: 14,
-        background: hovered ? '#1e1e2e' : '#161622',
+        background: hovered ? 'var(--bg3)' : 'var(--bg2)',
         border: `1px solid ${hovered ? link.cor + '55' : 'var(--border)'}`,
         borderRadius: 16, padding: '16px 18px',
         textDecoration: 'none', cursor: 'pointer',

@@ -169,7 +169,7 @@ function TransacaoRow({ transacao: t, busca, onClick }) {
       onMouseLeave={() => setHovered(false)}
       style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr 2fr auto',
-        background: hovered ? '#1e1e2e' : '#161622',
+        background: hovered ? 'var(--bg3)' : 'var(--bg2)',
         border: `1px solid ${hovered ? '#6366f144' : 'var(--border)'}`,
         borderRadius: 14, padding: '14px 20px', gap: 16,
         cursor: 'pointer', alignItems: 'center',
