@@ -5,14 +5,14 @@ export default function Toolbar({ onAutoLayout, onSaveLayout, onAtribuicoes, onM
     <div style={{
       position: 'absolute', top: 72, left: '50%', transform: 'translateX(-50%)',
       zIndex: 10, display: 'flex', alignItems: 'center', gap: 10,
-      background: '#1e1e2e',
-      border: '1px solid #2d2d44',
+      background: 'var(--bg3)',
+      border: '1px solid var(--border)',
       borderRadius: 40,
       padding: '8px 20px',
       boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
       whiteSpace: 'nowrap',
     }}>
-      <span style={{ fontWeight: 700, fontSize: 16, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text)', letterSpacing: '-0.02em' }}>
         🏢 Organograma
       </span>
 
@@ -20,7 +20,7 @@ export default function Toolbar({ onAutoLayout, onSaveLayout, onAtribuicoes, onM
 
       {/* Toggle visão */}
       <div style={{
-        display: 'flex', background: '#0f0f17', border: '1px solid #2d2d44',
+        display: 'flex', background: 'var(--bg)', border: '1px solid var(--border)',
         borderRadius: 30, padding: 3, gap: 2,
       }}>
         <button onClick={() => !isHierarquia && onToggleVisao()} style={{
@@ -65,7 +65,7 @@ export default function Toolbar({ onAutoLayout, onSaveLayout, onAtribuicoes, onM
       {/* Badge visualizador */}
       {!canEdit && (
         <span style={{
-          fontSize: 11, color: '#475569', fontWeight: 600,
+          fontSize: 11, color: 'var(--text5)', fontWeight: 600,
           background: '#475569' + '18', border: '1px solid #47556933',
           borderRadius: 20, padding: '4px 12px',
         }}>

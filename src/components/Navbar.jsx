@@ -12,13 +12,11 @@ export default function Navbar() {
     .split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 
   return (
-    <nav style={{
+    <nav className="navbar" style={{
       position: 'fixed', top: 0, left: 0, right: 0, height: 52,
-      background: '#13131f', borderBottom: '1px solid #2d2d44',
-      display: 'flex', alignItems: 'center', padding: '0 24px', gap: 8,
-      zIndex: 1000, boxShadow: '0 2px 16px rgba(0,0,0,0.4)',
+      display: 'flex', alignItems: 'center', padding: '0 24px', gap: 8, zIndex: 1000,
     }}>
-      <span style={{ fontWeight: 800, fontSize: 15, color: '#e2e8f0', marginRight: 16, letterSpacing: '-0.02em' }}>
+      <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--text)', marginRight: 16, letterSpacing: '-0.02em' }}>
         🏢 Painel
       </span>
 
@@ -35,7 +33,7 @@ export default function Navbar() {
         target="_blank"
         rel="noopener noreferrer"
         style={{
-          color: '#64748b',
+          color: 'var(--text4)',
           background: 'transparent',
           border: '1px solid transparent',
           borderRadius: 20,
@@ -82,7 +80,7 @@ export default function Navbar() {
           }
         </div>
 
-        <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 13, color: 'var(--text3)', fontWeight: 500, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {user?.nome_usuario || user?.cargo || ''}
         </span>
 
@@ -105,9 +103,9 @@ export default function Navbar() {
           onClick={logout}
           title="Sair"
           style={{
-            background: 'none', border: '1px solid #2d2d44',
+            background: 'none', border: '1px solid var(--border)',
             borderRadius: 8, padding: '4px 10px',
-            color: '#475569', fontSize: 12, fontWeight: 600,
+            color: 'var(--text5)', fontSize: 12, fontWeight: 600,
             cursor: 'pointer', fontFamily: 'Inter, sans-serif',
             transition: 'all 0.15s',
           }}

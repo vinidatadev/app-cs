@@ -27,22 +27,20 @@ export default function Login() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh', background: '#0f0f17',
+    <div className="page" style={{
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <div style={{
-        background: '#1e1e2e', border: '1px solid #2d2d44',
+      <div className="card" style={{
         borderRadius: 24, padding: '40px 36px', width: '100%', maxWidth: 400,
-        boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+        boxShadow: '0 24px 64px var(--shadow)',
       }}>
         {/* Logo / título */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ fontSize: 36, marginBottom: 10 }}>🏢</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.02em' }}>
             Painel CS
           </h1>
-          <p style={{ fontSize: 13, color: '#475569', marginTop: 6 }}>
+          <p style={{ fontSize: 13, color: 'var(--text4)', marginTop: 6 }}>
             Entre com sua conta corporativa
           </p>
         </div>
@@ -57,6 +55,7 @@ export default function Login() {
               placeholder="seu@email.com"
               required
               disabled={loading}
+              className="t-input"
               style={inputStyle}
             />
           </div>
@@ -70,6 +69,7 @@ export default function Login() {
               placeholder="••••••••"
               required
               disabled={loading}
+              className="t-input"
               style={inputStyle}
             />
           </div>
@@ -107,13 +107,12 @@ export default function Login() {
 }
 
 const labelStyle = {
-  display: 'block', fontSize: 11, fontWeight: 700, color: '#475569',
+  display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text4)',
   textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6,
 }
 
 const inputStyle = {
-  width: '100%', background: '#0f0f17', border: '1px solid #2d2d44',
-  borderRadius: 10, padding: '11px 14px', color: '#e2e8f0',
+  width: '100%', borderRadius: 10, padding: '11px 14px',
   fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none',
-  boxSizing: 'border-box', transition: 'border-color 0.15s',
+  boxSizing: 'border-box',
 }

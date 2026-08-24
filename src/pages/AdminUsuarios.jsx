@@ -68,23 +68,23 @@ export default function AdminUsuarios() {
 
   if (!isAdmin) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0f0f17', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
+      <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
         <div style={{ fontSize: 44 }}>🔒</div>
-        <p style={{ color: '#f1f5f9', fontWeight: 700 }}>Acesso restrito a administradores</p>
+        <p style={{ color: 'var(--text2)', fontWeight: 700 }}>Acesso restrito a administradores</p>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0f17' }}>
+    <div className="page" style={{ minHeight: '100vh' }}>
       <Navbar />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '80px 24px 64px' }}>
 
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.02em' }}>
             ⚙ Administração de Usuários
           </h1>
-          <p style={{ fontSize: 13, color: '#475569', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: 'var(--text5)', marginTop: 4 }}>
             Gerencie permissões de acesso por módulo. Usuários com nível 2 têm acesso total automaticamente.
           </p>
         </div>
@@ -94,8 +94,8 @@ export default function AdminUsuarios() {
           onChange={e => setBusca(e.target.value)}
           placeholder="🔍 Buscar por nome ou cargo..."
           style={{
-            width: '100%', background: '#1e1e2e', border: '1px solid #2d2d44',
-            borderRadius: 12, padding: '11px 16px', color: '#e2e8f0',
+            width: '100%', background: 'var(--bg3)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '11px 16px', color: 'var(--text)',
             fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none',
             boxSizing: 'border-box', marginBottom: 20,
           }}
@@ -109,7 +109,7 @@ export default function AdminUsuarios() {
             {/* Cabeçalho */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px 120px 80px 80px', gap: 12, padding: '6px 20px' }}>
               {['Usuário', 'Organograma', 'Transações', 'Capacitação', 'Links', ''].map(h => (
-                <span key={h} style={{ fontSize: 10, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</span>
+                <span key={h} style={{ fontSize: 10, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</span>
               ))}
             </div>
 
@@ -122,7 +122,7 @@ export default function AdminUsuarios() {
                 <div key={u.id} style={{
                   display: 'grid', gridTemplateColumns: '1fr 120px 120px 120px 80px 80px',
                   gap: 12, alignItems: 'center',
-                  background: '#161622', border: `1px solid ${isNivel2 ? '#6366f133' : '#2d2d44'}`,
+                  background: 'var(--bg2)', border: `1px solid ${isNivel2 ? '#6366f133' : '#2d2d44'}`,
                   borderRadius: 14, padding: '14px 20px',
                 }}>
 
@@ -130,10 +130,10 @@ export default function AdminUsuarios() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <Avatar user={u} />
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: 14, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {u.nome_usuario || `ID ${u.id}`}
                       </div>
-                      <div style={{ fontSize: 11, color: '#64748b' }}>{u.cargo || '—'}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text4)' }}>{u.cargo || '—'}</div>
                     </div>
                     {isNivel2 && (
                       <span style={{ fontSize: 10, color: '#6366f1', background: '#6366f118', border: '1px solid #6366f133', borderRadius: 20, padding: '2px 8px', fontWeight: 700, flexShrink: 0 }}>
@@ -199,7 +199,7 @@ export default function AdminUsuarios() {
                         {isSaving ? '...' : 'Salvar'}
                       </button>
                     ) : !u.id_user ? (
-                      <span style={{ fontSize: 10, color: '#475569' }} title="Usuário sem login vinculado">sem auth</span>
+                      <span style={{ fontSize: 10, color: 'var(--text5)' }} title="Usuário sem login vinculado">sem auth</span>
                     ) : null}
                   </div>
                 </div>
@@ -231,7 +231,7 @@ function PermSelect({ value, disabled, onChange }) {
       }}
     >
       {PERMISSAO_OPTS.map(o => (
-        <option key={o} value={o} style={{ background: '#1e1e2e', color: '#e2e8f0' }}>
+        <option key={o} value={o} style={{ background: 'var(--bg3)', color: 'var(--text)' }}>
           {o === 'none' ? '— nenhum' : o === 'viewer' ? '👁 viewer' : '✏ editor'}
         </option>
       ))}

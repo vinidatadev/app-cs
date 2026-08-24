@@ -100,14 +100,14 @@ const OUTROS = [
 
 export default function Links() {
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0f17' }}>
+    <div className="page">
       <Navbar />
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '80px 24px 64px' }}>
 
         {/* Header */}
         <div style={{ marginBottom: 40 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.03em' }}>Links Rápidos</h1>
-          <p style={{ fontSize: 13, color: '#475569', marginTop: 4 }}>Acesso direto aos sistemas e relatórios do setor</p>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.03em' }}>Links Rápidos</h1>
+          <p style={{ fontSize: 13, color: 'var(--text5)', marginTop: 4 }}>Acesso direto aos sistemas e relatórios do setor</p>
         </div>
 
         {/* Seção Power BI */}
@@ -145,11 +145,11 @@ function Section({ titulo, subtitulo, icone, cor, links }) {
           {icone}
         </div>
         <div>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.01em' }}>{titulo}</h2>
-          <p style={{ fontSize: 12, color: '#475569', marginTop: 1 }}>{subtitulo}</p>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text2)', letterSpacing: '-0.01em' }}>{titulo}</h2>
+          <p style={{ fontSize: 12, color: 'var(--text5)', marginTop: 1 }}>{subtitulo}</p>
         </div>
         <div style={{ flex: 1, height: 1, background: '#2d2d44', marginLeft: 8 }} />
-        <span style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>{links.length} links</span>
+        <span style={{ fontSize: 11, color: 'var(--text5)', fontWeight: 600 }}>{links.length} links</span>
       </div>
 
       {/* Grid de cards */}
@@ -193,10 +193,10 @@ function LinkCard({ link }) {
 
       {/* Texto */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: '#f1f5f9', marginBottom: 4, letterSpacing: '-0.01em' }}>
+        <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text2)', marginBottom: 4, letterSpacing: '-0.01em' }}>
           {link.nome}
         </div>
-        <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>
+        <div style={{ fontSize: 12, color: 'var(--text4)', lineHeight: 1.5 }}>
           {link.descricao}
         </div>
       </div>

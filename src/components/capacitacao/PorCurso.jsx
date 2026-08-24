@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const STATUS_CONFIG = {
-  pendente:  { label: 'Pendente',  color: '#475569' },
+  pendente:  { label: 'Pendente',  color: 'var(--text5)' },
   iniciado:  { label: 'Iniciado',  color: '#f97316' },
   concluido: { label: 'Concluído', color: '#22c55e' },
 }
@@ -66,7 +66,7 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
 
           return (
             <div key={curso.id} style={{
-              background: '#161622', border: `1px solid ${isOpen ? '#6366f155' : '#2d2d44'}`,
+              background: 'var(--bg2)', border: `1px solid ${isOpen ? '#6366f155' : '#2d2d44'}`,
               borderRadius: 16, overflow: 'hidden', transition: 'border-color 0.15s',
             }}>
               {/* Card header */}
@@ -75,7 +75,7 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: '#f1f5f9', lineHeight: 1.3, marginBottom: 4 }}>{curso.curso}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text2)', lineHeight: 1.3, marginBottom: 4 }}>{curso.curso}</div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {curso.categoria && <Tag label={curso.categoria} color="#6366f1" />}
                       {curso.nivel && <Tag label={curso.nivel} color={NIVEL_COLOR[curso.nivel] || '#64748b'} />}
@@ -100,9 +100,9 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
 
               {/* Expandido: só pessoas com o curso atribuído */}
               {isOpen && (
-                <div style={{ borderTop: '1px solid #2d2d44', padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ borderTop: '1px solid var(--border)', padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {progressos.filter(p => p.id_curso === curso.id).length === 0 && (
-                    <p style={{ fontSize: 12, color: '#475569', textAlign: 'center', padding: '8px 0', fontStyle: 'italic' }}>
+                    <p style={{ fontSize: 12, color: 'var(--text5)', textAlign: 'center', padding: '8px 0', fontStyle: 'italic' }}>
                       Nenhum colaborador com este curso atribuído
                     </p>
                   )}
@@ -118,7 +118,7 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
                           <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#6366f122', border: '1px solid #6366f133', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
                             {u.foto ? <img src={u.foto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 9, fontWeight: 700, color: '#6366f1' }}>{(u.nome_usuario || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}</span>}
                           </div>
-                          <span style={{ flex: 1, fontSize: 12, color: '#e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</span>
+                          <span style={{ flex: 1, fontSize: 12, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</span>
                           <button
                             onClick={onSetStatus ? () => onSetStatus(u.id, curso.id, nextStatus) : undefined}
                             disabled={!onSetStatus}
@@ -153,4 +153,4 @@ function Tag({ label, color }) {
   )
 }
 
-const inputStyle = { background: '#161622', border: '1px solid #2d2d44', borderRadius: 10, padding: '9px 14px', color: '#e2e8f0', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }
+const inputStyle = { background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 10, padding: '9px 14px', color: 'var(--text)', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }

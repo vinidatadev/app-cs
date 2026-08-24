@@ -64,15 +64,15 @@ export default function Capacitacao() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0f17' }}>
+    <div className="page">
       <Navbar />
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px 48px' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.03em' }}>Capacitação</h1>
-            <p style={{ fontSize: 13, color: '#475569', marginTop: 4 }}>
+            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.03em' }}>Capacitação</h1>
+            <p style={{ fontSize: 13, color: 'var(--text5)', marginTop: 4 }}>
               {cursos.length} cursos · {usersFiltrados.length} colaboradores
               {setorFiltro !== 'Todos' && <span style={{ color: '#6366f1', fontWeight: 600 }}> · {setorFiltro}</span>}
             </p>
@@ -80,7 +80,7 @@ export default function Capacitacao() {
 
           {/* Filtro de setor */}
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: 11, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4 }}>Setor:</span>
+            <span style={{ fontSize: 11, color: 'var(--text5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4 }}>Setor:</span>
             {setores.map(s => (
               <button key={s} onClick={() => setSetorFiltro(s)} style={{
                 background: setorFiltro === s ? '#6366f1' : '#161622',
@@ -94,7 +94,7 @@ export default function Capacitacao() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, background: '#161622', border: '1px solid #2d2d44', borderRadius: 30, padding: 4, width: 'fit-content', marginBottom: 32 }}>
+        <div style={{ display: 'flex', gap: 4, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 30, padding: 4, width: 'fit-content', marginBottom: 32 }}>
           {[
             ['pessoa', '👤 Por Pessoa'],
             ['curso', '📚 Por Curso'],

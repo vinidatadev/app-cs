@@ -44,8 +44,8 @@ export default function PorPessoa({ users, cursos, progressos, onSetStatus, onAd
               >
                 <Avatar user={u} size={42} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</div>
-                  <div style={{ fontSize: 11, color: '#64748b', marginBottom: 6 }}>{u.cargo || '—'}</div>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text4)', marginBottom: 6 }}>{u.cargo || '—'}</div>
                   {/* barra de progresso */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ flex: 1, height: 4, background: '#2d2d44', borderRadius: 4, overflow: 'hidden' }}>
@@ -94,4 +94,4 @@ function StatusPill({ label, color }) {
   return <span style={{ fontSize: 10, color, fontWeight: 600 }}>{label}</span>
 }
 
-const inputStyle = { width: '100%', background: '#161622', border: '1px solid #2d2d44', borderRadius: 10, padding: '10px 14px', color: '#e2e8f0', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }
+const inputStyle = { width: '100%', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 14px', color: 'var(--text)', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }

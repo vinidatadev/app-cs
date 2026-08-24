@@ -90,20 +90,20 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
     }}>
       <div style={{
-        background: '#1e1e2e', border: '1px solid #2d2d44', borderRadius: 20,
+        background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 20,
         width: 640, maxHeight: '88vh', display: 'flex', flexDirection: 'column',
         boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
       }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 28px 16px' }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f1f5f9' }}>🏷 Atribuições</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: 22 }}>✕</button>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text2)' }}>🏷 Atribuições</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text4)', cursor: 'pointer', fontSize: 22 }}>✕</button>
         </div>
 
         <div style={{ display: 'flex', flex: 1, minHeight: 0, gap: 0 }}>
 
           {/* Coluna esquerda — gerenciar atribuições */}
-          <div style={{ width: 220, borderRight: '1px solid #2d2d44', padding: '0 20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ width: 220, borderRight: '1px solid var(--border)', padding: '0 20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <p style={sectionLabel}>Atribuições</p>
 
             {/* Criar nova */}
@@ -166,8 +166,8 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     fontFamily: 'Inter, sans-serif',
                   }}>
-                  <span style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 500 }}>{u.nome_usuario || `ID ${u.id}`}</span>
-                  <span style={{ color: '#475569', fontSize: 11 }}>{u.cargo || ''}</span>
+                  <span style={{ color: 'var(--text)', fontSize: 13, fontWeight: 500 }}>{u.nome_usuario || `ID ${u.id}`}</span>
+                  <span style={{ color: 'var(--text5)', fontSize: 11 }}>{u.cargo || ''}</span>
                 </button>
               ))}
             </div>
@@ -176,13 +176,13 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
             {userSelecionado && (
               <>
                 <p style={{ ...sectionLabel, marginBottom: 8 }}>
-                  Atribuições de <span style={{ color: '#e2e8f0' }}>{userSelecionado.nome_usuario}</span>
+                  Atribuições de <span style={{ color: 'var(--text)' }}>{userSelecionado.nome_usuario}</span>
                 </p>
 
                 {/* Tags atuais */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, minHeight: 30, marginBottom: 12 }}>
                   {(userAtrib[userSelecionado.id] || []).length === 0 && (
-                    <span style={{ color: '#475569', fontSize: 12 }}>Nenhuma atribuição</span>
+                    <span style={{ color: 'var(--text5)', fontSize: 12 }}>Nenhuma atribuição</span>
                   )}
                   {(userAtrib[userSelecionado.id] || []).map(a => (
                     <span key={a.id} style={{
@@ -211,7 +211,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
                   {atribBusca && atribDisponiveis.length > 0 && (
                     <div style={{
                       position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4,
-                      background: '#161622', border: '1px solid #2d2d44', borderRadius: 10,
+                      background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 10,
                       zIndex: 10, overflow: 'hidden',
                     }}>
                       {atribDisponiveis.map(a => (
@@ -219,13 +219,13 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
                           display: 'flex', alignItems: 'center', gap: 8,
                           width: '100%', padding: '9px 14px', background: 'none',
                           border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                          borderBottom: '1px solid #2d2d44',
+                          borderBottom: '1px solid var(--border)',
                         }}
                           onMouseEnter={e => e.currentTarget.style.background = '#2d2d44'}
                           onMouseLeave={e => e.currentTarget.style.background = 'none'}
                         >
                           <span style={{ width: 10, height: 10, borderRadius: '50%', background: a.cor, flexShrink: 0 }} />
-                          <span style={{ color: '#e2e8f0', fontSize: 13 }}>{a.nome}</span>
+                          <span style={{ color: 'var(--text)', fontSize: 13 }}>{a.nome}</span>
                         </button>
                       ))}
                     </div>
@@ -240,6 +240,6 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
   )
 }
 
-const sectionLabel = { fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10, marginTop: 8 }
-const inputStyle = { background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 10, padding: '9px 12px', color: '#e2e8f0', fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none', width: '100%' }
+const sectionLabel = { fontSize: 11, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10, marginTop: 8 }
+const inputStyle = { background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '9px 12px', color: 'var(--text)', fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none', width: '100%' }
 const btnStyle = (color) => ({ background: `${color}22`, border: `1px solid ${color}55`, color, borderRadius: 20, padding: '7px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', width: '100%' })

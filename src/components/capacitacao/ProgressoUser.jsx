@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const STATUS_CONFIG = {
-  pendente:  { label: 'Pendente',  color: '#475569', bg: '#47556922', next: 'iniciado',  nextLabel: 'Iniciar' },
+  pendente:  { label: 'Pendente',  color: 'var(--text5)', bg: '#47556922', next: 'iniciado',  nextLabel: 'Iniciar' },
   iniciado:  { label: 'Iniciado',  color: '#f97316', bg: '#f9731622', next: 'concluido', nextLabel: '✓ Concluir' },
   concluido: { label: 'Concluído', color: '#22c55e', bg: '#22c55e22', next: 'pendente',  nextLabel: 'Resetar' },
 }
@@ -37,20 +37,20 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
 
   return (
     <div style={{
-      background: '#161622', border: '1px solid #2d2d44', borderRadius: 20,
+      background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 20,
       position: 'sticky', top: 90, maxHeight: 'calc(100vh - 130px)', display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     }}>
       {/* Header */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid #2d2d44', flexShrink: 0 }}>
+      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#6366f122', border: '2px solid #6366f144', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
               {user.foto ? <img src={user.foto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 14, fontWeight: 700, color: '#6366f1' }}>{initials}</span>}
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#f1f5f9' }}>{user.nome_usuario}</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>{user.cargo || '—'}</div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text2)' }}>{user.nome_usuario}</div>
+              <div style={{ fontSize: 11, color: 'var(--text4)' }}>{user.cargo || '—'}</div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -64,7 +64,7 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
                 {atribuindo ? '✕ Fechar' : '+ Atribuir'}
               </button>
             )}
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: 18 }}>✕</button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text5)', cursor: 'pointer', fontSize: 18 }}>✕</button>
           </div>
         </div>
 
@@ -75,37 +75,37 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
           </div>
           <span style={{ fontSize: 18, fontWeight: 800, color: pct === 100 ? '#22c55e' : '#6366f1', minWidth: 44 }}>{pct}%</span>
         </div>
-        <div style={{ fontSize: 11, color: '#475569', marginTop: 6 }}>
+        <div style={{ fontSize: 11, color: 'var(--text5)', marginTop: 6 }}>
           {concluidos} de {total} cursos concluídos
         </div>
       </div>
 
       {/* Painel de atribuição */}
       {atribuindo && (
-        <div style={{ borderBottom: '1px solid #2d2d44', padding: '12px 20px', flexShrink: 0 }}>
+        <div style={{ borderBottom: '1px solid var(--border)', padding: '12px 20px', flexShrink: 0 }}>
           <input
             value={busca}
             onChange={e => setBusca(e.target.value)}
             placeholder="🔍 Buscar curso para atribuir..."
-            style={{ width: '100%', background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 8, padding: '7px 12px', color: '#e2e8f0', fontSize: 12, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }}
+            style={{ width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 12px', color: 'var(--text)', fontSize: 12, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box', marginBottom: 8 }}
           />
           <div style={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
             {cursosFiltrados.length === 0 && (
-              <p style={{ fontSize: 12, color: '#475569', textAlign: 'center', padding: '8px 0' }}>
+              <p style={{ fontSize: 12, color: 'var(--text5)', textAlign: 'center', padding: '8px 0' }}>
                 {cursosNaoAtribuidos.length === 0 ? 'Todos os cursos já atribuídos' : 'Nenhum resultado'}
               </p>
             )}
             {cursosFiltrados.map(c => (
               <button key={c.id} onClick={() => { onAddCurso(c.id); setBusca('') }} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 8,
+                background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
                 padding: '7px 12px', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                 transition: 'border-color 0.15s',
               }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f155'}
                 onMouseLeave={e => e.currentTarget.style.borderColor = '#2d2d44'}
               >
-                <span style={{ fontSize: 12, color: '#e2e8f0', textAlign: 'left' }}>{c.curso}</span>
+                <span style={{ fontSize: 12, color: 'var(--text)', textAlign: 'left' }}>{c.curso}</span>
                 <span style={{ fontSize: 10, color: '#6366f1', fontWeight: 700, marginLeft: 8, flexShrink: 0 }}>+ atribuir</span>
               </button>
             ))}
@@ -116,13 +116,13 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
       {/* Lista de cursos atribuídos */}
       <div style={{ overflowY: 'auto', flex: 1, padding: '12px 20px 20px' }}>
         {total === 0 && (
-          <p style={{ color: '#475569', fontSize: 13, textAlign: 'center', marginTop: 24, fontStyle: 'italic' }}>
+          <p style={{ color: 'var(--text5)', fontSize: 13, textAlign: 'center', marginTop: 24, fontStyle: 'italic' }}>
             Nenhum curso atribuído ainda.{onAddCurso ? ' Use "+ Atribuir" para adicionar.' : ''}
           </p>
         )}
         {Object.entries(porCategoria).map(([cat, cursosGrupo]) => (
           <div key={cat} style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, paddingTop: 8, borderTop: '1px solid #2d2d4444' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8, paddingTop: 8, borderTop: '1px solid #2d2d4444' }}>
               {cat}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -130,17 +130,17 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
                 const status = statusMap[curso.id] || 'pendente'
                 const cfg = STATUS_CONFIG[status]
                 return (
-                  <div key={curso.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 10, background: '#0f0f17', border: '1px solid #2d2d44' }}>
+                  <div key={curso.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 10, background: 'var(--bg)', border: '1px solid var(--border)' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 500, color: status === 'concluido' ? '#64748b' : '#e2e8f0', textDecoration: status === 'concluido' ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {curso.curso}
                       </div>
-                      {curso.carga_horaria && <div style={{ fontSize: 10, color: '#475569' }}>⏱ {curso.carga_horaria}</div>}
+                      {curso.carga_horaria && <div style={{ fontSize: 10, color: 'var(--text5)' }}>⏱ {curso.carga_horaria}</div>}
                     </div>
                     <StatusBtn status={status} cfg={cfg} onClick={onSetStatus ? () => onSetStatus(curso.id, cfg.next) : null} />
                     {onRemoveCurso && (
                       <button onClick={() => onRemoveCurso(curso.id)} title="Remover curso" style={{
-                        background: 'none', border: 'none', color: '#475569', cursor: 'pointer',
+                        background: 'none', border: 'none', color: 'var(--text5)', cursor: 'pointer',
                         fontSize: 14, padding: '0 2px', lineHeight: 1, flexShrink: 0,
                       }}
                         onMouseEnter={e => e.currentTarget.style.color = '#fca5a5'}

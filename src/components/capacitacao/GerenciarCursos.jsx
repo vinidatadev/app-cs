@@ -108,7 +108,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
       </div>
 
       {/* Contador */}
-      <p style={{ fontSize: 12, color: '#475569', marginBottom: 14 }}>
+      <p style={{ fontSize: 12, color: 'var(--text5)', marginBottom: 14 }}>
         {filtrados.length} curso{filtrados.length !== 1 ? 's' : ''} · {cursos.filter(c => c.ativo).length} ativos
       </p>
 
@@ -117,7 +117,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
         {/* Header */}
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px 100px', gap: 12, padding: '6px 16px' }}>
           {['Curso', 'Categoria', 'Nível', 'Carga', ''].map(h => (
-            <span key={h} style={{ fontSize: 10, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</span>
+            <span key={h} style={{ fontSize: 10, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</span>
           ))}
         </div>
 
@@ -130,11 +130,11 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
             borderRadius: 12, opacity: curso.ativo ? 1 : 0.5,
           }}>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {curso.curso}
               </div>
               {curso.descricao && (
-                <div style={{ fontSize: 11, color: '#475569', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'var(--text5)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>
                   {curso.descricao}
                 </div>
               )}
@@ -149,10 +149,10 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
                     const c = COLORS[Math.abs(tag.split('').reduce((a,ch) => a + ch.charCodeAt(0), 0)) % COLORS.length]
                     return <span key={tag} style={{ fontSize: 10, fontWeight: 600, color: c, background: `${c}18`, border: `1px solid ${c}33`, borderRadius: 20, padding: '1px 7px', whiteSpace: 'nowrap' }}>{tag}</span>
                   })
-                : <span style={{ fontSize: 11, color: '#475569' }}>—</span>
+                : <span style={{ fontSize: 11, color: 'var(--text5)' }}>—</span>
               }
             </div>
-            <span style={{ fontSize: 11, color: '#475569' }}>{curso.carga_horaria || '—'}</span>
+            <span style={{ fontSize: 11, color: 'var(--text5)' }}>{curso.carga_horaria || '—'}</span>
 
             {/* Ações */}
             <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
@@ -166,7 +166,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
         ))}
 
         {filtrados.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#475569', padding: 48 }}>
+          <div style={{ textAlign: 'center', color: 'var(--text5)', padding: 48 }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>📚</div>
             <p>{busca ? 'Nenhum curso encontrado' : 'Nenhum curso cadastrado'}</p>
           </div>
@@ -176,12 +176,12 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
       {/* Modal criar/editar */}
       {modal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 16 }}>
-          <div style={{ background: '#1e1e2e', border: '1px solid #2d2d44', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '22px 28px 16px', borderBottom: '1px solid #2d2d44', flexShrink: 0 }}>
-              <h2 style={{ fontSize: 17, fontWeight: 700, color: '#f1f5f9' }}>
+          <div style={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '22px 28px 16px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text2)' }}>
                 {modal.mode === 'criar' ? '+ Novo Curso' : '✎ Editar Curso'}
               </h2>
-              <button onClick={() => setModal(null)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: 20 }}>✕</button>
+              <button onClick={() => setModal(null)} style={{ background: 'none', border: 'none', color: 'var(--text4)', cursor: 'pointer', fontSize: 20 }}>✕</button>
             </div>
 
             <div style={{ overflowY: 'auto', flex: 1, padding: '20px 28px', display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -235,7 +235,7 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', padding: '16px 28px 24px', borderTop: '1px solid #2d2d44', flexShrink: 0 }}>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', padding: '16px 28px 24px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
               <button onClick={() => setModal(null)} style={btnStyle('#64748b')}>Cancelar</button>
               <button onClick={handleSave} disabled={saving || !form.curso.trim()} style={btnStyle('#6366f1')}>
                 {saving ? 'Salvando...' : modal.mode === 'criar' ? 'Criar curso' : 'Salvar alterações'}
@@ -248,11 +248,11 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
       {/* Confirm delete */}
       {confirmDelete && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
-          <div style={{ background: '#1e1e2e', border: '1px solid #2d2d44', borderRadius: 20, padding: 32, maxWidth: 400, width: '100%', margin: 16 }}>
+          <div style={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 20, padding: 32, maxWidth: 400, width: '100%', margin: 16 }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🗑</div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#f1f5f9', marginBottom: 8 }}>Excluir curso?</h3>
-            <p style={{ fontSize: 13, color: '#64748b', marginBottom: 24, lineHeight: 1.6 }}>
-              "<strong style={{ color: '#e2e8f0' }}>{confirmDelete.curso}</strong>" será removido permanentemente, incluindo todo o progresso dos colaboradores.
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text2)', marginBottom: 8 }}>Excluir curso?</h3>
+            <p style={{ fontSize: 13, color: 'var(--text4)', marginBottom: 24, lineHeight: 1.6 }}>
+              "<strong style={{ color: 'var(--text)' }}>{confirmDelete.curso}</strong>" será removido permanentemente, incluindo todo o progresso dos colaboradores.
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={() => setConfirmDelete(null)} style={btnStyle('#64748b')}>Cancelar</button>
@@ -296,7 +296,7 @@ function NivelTagInput({ value, onChange }) {
     <div>
       <div style={{
         display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center',
-        background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 10,
+        background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10,
         padding: '7px 10px', minHeight: 42,
       }}>
         {tags.map(tag => (
@@ -316,14 +316,14 @@ function NivelTagInput({ value, onChange }) {
           onKeyDown={handleKey}
           onBlur={() => input && addTag(input)}
           placeholder={tags.length === 0 ? 'Digite e pressione Enter...' : ''}
-          style={{ background: 'none', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: 13, fontFamily: 'Inter, sans-serif', flex: 1, minWidth: 80 }}
+          style={{ background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontSize: 13, fontFamily: 'Inter, sans-serif', flex: 1, minWidth: 80 }}
         />
       </div>
       {/* Sugestões rápidas */}
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 6 }}>
         {NIVEL_SUGESTOES.filter(s => !tags.includes(s)).map(s => (
           <button key={s} onClick={() => addTag(s)} style={{
-            background: 'transparent', border: '1px dashed #2d2d44', color: '#475569',
+            background: 'transparent', border: '1px dashed #2d2d44', color: 'var(--text5)',
             borderRadius: 20, padding: '2px 10px', fontSize: 11, cursor: 'pointer',
             fontFamily: 'Inter, sans-serif',
           }}>+ {s}</button>
@@ -336,12 +336,12 @@ function NivelTagInput({ value, onChange }) {
 function Field({ label, children }) {
   return (
     <div>
-      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</label>
+      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</label>
       {children}
     </div>
   )
 }
 
-const inputStyle = { width: '100%', background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 10, padding: '9px 12px', color: '#e2e8f0', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }
+const inputStyle = { width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '9px 12px', color: 'var(--text)', fontSize: 13, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }
 const btnStyle = (color) => ({ background: `${color}22`, border: `1px solid ${color}55`, color, borderRadius: 20, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' })
 const iconBtn = (color) => ({ background: `${color}18`, border: `1px solid ${color}33`, color, borderRadius: 8, width: 28, height: 28, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif' })

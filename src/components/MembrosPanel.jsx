@@ -52,14 +52,14 @@ export default function MembrosPanel({ users, relations, onClose, onRefresh }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
     }}>
       <div style={{
-        background: '#1e1e2e', border: '1px solid #2d2d44', borderRadius: 20,
+        background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 20,
         width: 520, maxHeight: '88vh', display: 'flex', flexDirection: 'column',
         boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
       }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 28px 0' }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f1f5f9' }}>👥 Membros</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: 22 }}>✕</button>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text2)' }}>👥 Membros</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text4)', cursor: 'pointer', fontSize: 22 }}>✕</button>
         </div>
 
         <div style={{ padding: '16px 28px', display: 'flex', gap: 8 }}>
@@ -76,7 +76,7 @@ export default function MembrosPanel({ users, relations, onClose, onRefresh }) {
 
         {/* Formulário de criação */}
         {criando && (
-          <div style={{ margin: '0 28px 16px', background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 14, padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ margin: '0 28px 16px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 14, padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <p style={sectionLabel}>Novo membro</p>
             <div style={{ display: 'flex', gap: 8 }}>
               <input value={form.nome_usuario} onChange={e => set('nome_usuario', e.target.value)}
@@ -120,7 +120,7 @@ export default function MembrosPanel({ users, relations, onClose, onRefresh }) {
           )}
 
           {filtrados.length === 0 && (
-            <p style={{ color: '#475569', fontSize: 13, textAlign: 'center', marginTop: 24 }}>Nenhum membro encontrado</p>
+            <p style={{ color: 'var(--text5)', fontSize: 13, textAlign: 'center', marginTop: 24 }}>Nenhum membro encontrado</p>
           )}
         </div>
       </div>
@@ -134,7 +134,7 @@ function UserRow({ user, inOrganograma, onAdd }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
-      background: '#0f0f17', border: `1px solid ${inOrganograma ? '#2d2d44' : '#2d2d44'}`,
+      background: 'var(--bg)', border: `1px solid ${inOrganograma ? '#2d2d44' : '#2d2d44'}`,
       borderRadius: 12, padding: '10px 14px',
     }}>
       {/* Avatar */}
@@ -151,10 +151,10 @@ function UserRow({ user, inOrganograma, onAdd }) {
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 600, fontSize: 14, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {user.nome_usuario || `ID ${user.id}`}
         </div>
-        <div style={{ fontSize: 12, color: '#64748b', marginTop: 1 }}>{user.cargo || '—'}</div>
+        <div style={{ fontSize: 12, color: 'var(--text4)', marginTop: 1 }}>{user.cargo || '—'}</div>
       </div>
 
       {/* Status / ação */}
@@ -176,6 +176,6 @@ function UserRow({ user, inOrganograma, onAdd }) {
   )
 }
 
-const inputStyle = { background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 10, padding: '9px 12px', color: '#e2e8f0', fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none', width: '100%' }
+const inputStyle = { background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '9px 12px', color: 'var(--text)', fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none', width: '100%' }
 const btnStyle = (color) => ({ background: `${color}22`, border: `1px solid ${color}44`, color, borderRadius: 20, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap' })
-const sectionLabel = { fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em' }
+const sectionLabel = { fontSize: 11, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.06em' }

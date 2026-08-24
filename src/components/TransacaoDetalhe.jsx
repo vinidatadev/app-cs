@@ -93,12 +93,12 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
       zIndex: 100, overflowY: 'auto', padding: '48px 16px',
     }}>
       <div style={{
-        background: '#1a1a2e', border: '1px solid #2d2d44', borderRadius: 24,
+        background: '#1a1a2e', border: '1px solid var(--border)', borderRadius: 24,
         width: '100%', maxWidth: 800, boxShadow: '0 32px 80px rgba(0,0,0,0.8)',
       }}>
 
         {/* ── HEADER ── */}
-        <div style={{ padding: '28px 32px 24px', borderBottom: '1px solid #2d2d44' }}>
+        <div style={{ padding: '28px 32px 24px', borderBottom: '1px solid var(--border)' }}>
 
           {/* Linha 1: badge módulo + botões */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -118,7 +118,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                 }}>🗑 Excluir</button>
               )}
               <button onClick={onClose} style={{
-                background: '#ffffff10', border: '1px solid #ffffff15', color: '#94a3b8',
+                background: '#ffffff10', border: '1px solid #ffffff15', color: 'var(--text3)',
                 borderRadius: '50%', width: 32, height: 32, fontSize: 16, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>✕</button>
@@ -130,20 +130,20 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
 
             {/* Esquerda */}
             <div>
-              <h2 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.03em', marginBottom: 12, lineHeight: 1.2 }}>
+              <h2 style={{ fontSize: 26, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.03em', marginBottom: 12, lineHeight: 1.2 }}>
                 {transacao.transacao}
               </h2>
 
               {/* Descrição inline editável */}
               {canEdit && editandoDesc ? (
-                <div style={{ background: '#0f0f17', border: '1px solid #6366f155', borderRadius: 12, padding: 14 }}>
+                <div style={{ background: 'var(--bg)', border: '1px solid #6366f155', borderRadius: 12, padding: 14 }}>
                   <textarea
                     value={draftDesc}
                     onChange={e => setDraftDesc(e.target.value)}
                     autoFocus rows={3}
                     style={{
                       width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                      color: '#e2e8f0', fontSize: 14, fontFamily: 'Inter, sans-serif',
+                      color: 'var(--text)', fontSize: 14, fontFamily: 'Inter, sans-serif',
                       resize: 'vertical', lineHeight: 1.6, boxSizing: 'border-box',
                     }}
                   />
@@ -176,11 +176,11 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
 
             {/* Direita: ponto focal */}
             <div>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 10 }}>
                 Ponto focal
               </span>
 
-              {editandoFocal ? (                <div style={{ background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 14, overflow: 'hidden' }}>
+              {editandoFocal ? (                <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
                   <input
                     value={buscaFocal}
                     onChange={e => setBuscaFocal(e.target.value)}
@@ -188,30 +188,30 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                     autoFocus
                     style={{
                       width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                      padding: '9px 12px', color: '#e2e8f0', fontSize: 13,
+                      padding: '9px 12px', color: 'var(--text)', fontSize: 13,
                       fontFamily: 'Inter, sans-serif', boxSizing: 'border-box',
-                      borderBottom: '1px solid #2d2d44',
+                      borderBottom: '1px solid var(--border)',
                     }}
                   />
                   <div style={{ maxHeight: 180, overflowY: 'auto' }}>
                     {pontoFocal && (
                       <button onClick={() => savePontoFocal(null)} style={focalOpt(false)}>
                         <span style={{ fontSize: 14 }}>✕</span>
-                        <span style={{ color: '#94a3b8', fontSize: 12 }}>Remover</span>
+                        <span style={{ color: 'var(--text3)', fontSize: 12 }}>Remover</span>
                       </button>
                     )}
                     {users.filter(u => !buscaFocal || (u.nome_usuario || '').toLowerCase().includes(buscaFocal.toLowerCase())).map(u => (
                       <button key={u.id} onClick={() => savePontoFocal(u.id)} style={focalOpt(pontoFocal?.id === u.id)}>
                         <Avatar user={u} size={24} />
                         <div style={{ textAlign: 'left', minWidth: 0 }}>
-                          <div style={{ fontSize: 12, color: '#e2e8f0', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</div>
-                          {u.cargo && <div style={{ fontSize: 10, color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.cargo}</div>}
+                          <div style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.nome_usuario}</div>
+                          {u.cargo && <div style={{ fontSize: 10, color: 'var(--text4)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.cargo}</div>}
                         </div>
                         {pontoFocal?.id === u.id && <span style={{ marginLeft: 'auto', color: '#6366f1', fontSize: 12, flexShrink: 0 }}>✓</span>}
                       </button>
                     ))}
                   </div>
-                  <button onClick={() => { setEditandoFocal(false); setBuscaFocal('') }} style={{ width: '100%', background: 'none', border: 'none', borderTop: '1px solid #2d2d44', color: '#64748b', padding: '7px', cursor: 'pointer', fontSize: 11, fontFamily: 'Inter, sans-serif' }}>
+                  <button onClick={() => { setEditandoFocal(false); setBuscaFocal('') }} style={{ width: '100%', background: 'none', border: 'none', borderTop: '1px solid var(--border)', color: 'var(--text4)', padding: '7px', cursor: 'pointer', fontSize: 11, fontFamily: 'Inter, sans-serif' }}>
                     Cancelar
                   </button>
                 </div>
@@ -221,7 +221,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                   onClick={canEdit ? () => setEditandoFocal(true) : undefined}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    background: '#0f0f17', border: '1px solid #2d2d44', borderRadius: 14,
+                    background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 14,
                     padding: '10px 12px', cursor: canEdit ? 'pointer' : 'default', transition: 'border-color 0.15s',
                   }}
                   onMouseEnter={canEdit ? e => e.currentTarget.style.borderColor = '#6366f155' : undefined}
@@ -229,8 +229,8 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                 >
                   <Avatar user={pontoFocal} size={40} />
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pontoFocal.nome_usuario}</div>
-                    {pontoFocal.cargo && <div style={{ fontSize: 11, color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pontoFocal.cargo}</div>}
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pontoFocal.nome_usuario}</div>
+                    {pontoFocal.cargo && <div style={{ fontSize: 11, color: 'var(--text4)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pontoFocal.cargo}</div>}
                   </div>
                 </div>
               ) : (
@@ -239,18 +239,18 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
                   onClick={() => setEditandoFocal(true)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                    background: '#0f0f17', border: '1px dashed #2d2d44', borderRadius: 14,
-                    padding: '10px 12px', color: '#475569', fontSize: 12,
+                    background: 'var(--bg)', border: '1px dashed #2d2d44', borderRadius: 14,
+                    padding: '10px 12px', color: 'var(--text5)', fontSize: 12,
                     cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s',
                   }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f155'}
                   onMouseLeave={e => e.currentTarget.style.borderColor = '#2d2d44'}
                 >
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#1e1e2e', border: '1px dashed #3d3d55', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>👤</div>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--bg3)', border: '1px dashed #3d3d55', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>👤</div>
                   <span>Definir ponto focal</span>
                 </button>
                 ) : (
-                  <div style={{ fontSize: 13, color: '#475569', fontStyle: 'italic' }}>Não definido</div>
+                  <div style={{ fontSize: 13, color: 'var(--text5)', fontStyle: 'italic' }}>Não definido</div>
                 )
               )}
             </div>
@@ -260,7 +260,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
         {/* ── DETALHAMENTO ── */}
         <div style={{ padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {detalhes.length === 0 && !addingText && (
-            <p style={{ color: '#475569', fontSize: 13, fontStyle: 'italic' }}>Nenhum detalhe ainda. Adicione textos ou imagens abaixo.</p>
+            <p style={{ color: 'var(--text5)', fontSize: 13, fontStyle: 'italic' }}>Nenhum detalhe ainda. Adicione textos ou imagens abaixo.</p>
           )}
 
           {detalhes.map((d, i) => (
@@ -273,11 +273,11 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
           ))}
 
           {addingText && (
-            <div style={{ background: '#0f0f17', border: '1px solid #6366f133', borderRadius: 14, padding: 16 }}>
+            <div style={{ background: 'var(--bg)', border: '1px solid #6366f133', borderRadius: 14, padding: 16 }}>
               <textarea
                 value={novoTexto} onChange={e => setNovoTexto(e.target.value)}
                 placeholder="Digite o texto..." autoFocus rows={4}
-                style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: 14, fontFamily: 'Inter, sans-serif', resize: 'vertical', lineHeight: 1.7, boxSizing: 'border-box' }}
+                style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'var(--text)', fontSize: 14, fontFamily: 'Inter, sans-serif', resize: 'vertical', lineHeight: 1.7, boxSizing: 'border-box' }}
               />
               <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
                 <button onClick={() => { setAddingText(false); setNovoTexto('') }} style={smallBtn('#64748b')}>Cancelar</button>
@@ -289,7 +289,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
 
         {/* ── AÇÕES ── */}
         {canEdit && (
-        <div style={{ padding: '16px 32px 28px', borderTop: '1px solid #2d2d44', display: 'flex', gap: 10 }}>
+        <div style={{ padding: '16px 32px 28px', borderTop: '1px solid var(--border)', display: 'flex', gap: 10 }}>
           {!addingText && <button onClick={() => setAddingText(true)} style={smallBtn('#6366f1')}>+ Texto</button>}
           <button onClick={() => fileRef.current.click()} disabled={uploading} style={smallBtn('#22c55e')}>
             {uploading ? 'Enviando...' : '📎 Imagem'}
@@ -323,13 +323,13 @@ function DetalheBlock({ detalhe, index, total, onDelete, onMove, onSaveTexto, ca
   return (
     <div
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      style={{ position: 'relative', background: '#0f0f17', border: `1px solid ${editing ? '#6366f155' : '#2d2d44'}`, borderRadius: 14, overflow: 'hidden' }}
+      style={{ position: 'relative', background: 'var(--bg)', border: `1px solid ${editing ? '#6366f155' : '#2d2d44'}`, borderRadius: 14, overflow: 'hidden' }}
     >
       {detalhe.tipo === 'texto' ? (
         canEdit && editing ? (
           <div style={{ padding: 14 }}>
             <textarea value={draft} onChange={e => setDraft(e.target.value)} autoFocus rows={4}
-              style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: 14, fontFamily: 'Inter, sans-serif', resize: 'vertical', lineHeight: 1.7, boxSizing: 'border-box' }} />
+              style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'var(--text)', fontSize: 14, fontFamily: 'Inter, sans-serif', resize: 'vertical', lineHeight: 1.7, boxSizing: 'border-box' }} />
             <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'flex-end' }}>
               <button onClick={() => { setEditing(false); setDraft(detalhe.conteudo) }} style={smallBtn('#64748b')}>Cancelar</button>
               <button onClick={() => { if (draft.trim()) onSaveTexto(draft.trim()); setEditing(false) }} style={smallBtn('#6366f1')}>Salvar</button>
@@ -358,5 +358,5 @@ function DetalheBlock({ detalhe, index, total, onDelete, onMove, onSaveTexto, ca
 }
 
 const smallBtn = (color) => ({ background: `${color}22`, border: `1px solid ${color}55`, color, borderRadius: 20, padding: '7px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' })
-const ctrlBtn = { background: '#1e1e2ecc', border: '1px solid #2d2d44', color: '#94a3b8', borderRadius: 8, padding: '3px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }
-const focalOpt = (selected) => ({ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '7px 12px', background: selected ? '#6366f115' : 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderBottom: '1px solid #2d2d44' })
+const ctrlBtn = { background: '#1e1e2ecc', border: '1px solid var(--border)', color: 'var(--text3)', borderRadius: 8, padding: '3px 8px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }
+const focalOpt = (selected) => ({ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '7px 12px', background: selected ? '#6366f115' : 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif', borderBottom: '1px solid var(--border)' })

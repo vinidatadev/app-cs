@@ -15,30 +15,34 @@
   --text5:     #475569;
   --accent:    #6366f1;
   --shadow:    rgba(0,0,0,0.5);
+  --shadow-sm: rgba(0,0,0,0.4);
+  --card-hover: #1e1e2e;
 }
 
 /* ── Tema claro ──────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg:        #f1f5f9;
+  --bg:        #f8fafc;
   --bg2:       #ffffff;
-  --bg3:       #f8fafc;
-  --bg4:       #e2e8f0;
-  --border:    #cbd5e1;
-  --border2:   #94a3b8;
+  --bg3:       #f1f5f9;
+  --bg4:       #e8edf5;
+  --border:    #e2e8f0;
+  --border2:   #cbd5e1;
   --text:      #1e293b;
   --text2:     #0f172a;
-  --text3:     #334155;
-  --text4:     #475569;
-  --text5:     #64748b;
+  --text3:     #475569;
+  --text4:     #64748b;
+  --text5:     #94a3b8;
   --accent:    #6366f1;
-  --shadow:    rgba(0,0,0,0.1);
+  --shadow:    rgba(15,23,42,0.08);
+  --shadow-sm: rgba(15,23,42,0.06);
+  --card-hover: #f1f5f9;
 }
 
 body {
   font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.25s, color 0.25s;
 }
 
 #root {
@@ -52,19 +56,56 @@ body {
   overflow: hidden;
 }
 
-/* ── React Flow ──────────────────────────────────────────── */
-.react-flow__background {
-  background: var(--bg) !important;
+/* ── Utilitários de tema (aplicados nos componentes) ─────── */
+.t-bg   { background: var(--bg)  !important; }
+.t-bg2  { background: var(--bg2) !important; }
+.t-bg3  { background: var(--bg3) !important; }
+.t-bg4  { background: var(--bg4) !important; }
+.t-border { border-color: var(--border) !important; }
+.t-text  { color: var(--text)  !important; }
+.t-text2 { color: var(--text2) !important; }
+.t-text3 { color: var(--text3) !important; }
+.t-text4 { color: var(--text4) !important; }
+
+/* ── Navbar ──────────────────────────────────────────────── */
+.navbar {
+  background: var(--bg4);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.25s, border-color 0.25s;
+  box-shadow: 0 2px 16px var(--shadow);
 }
 
-.react-flow__edge-path {
-  stroke: #6366f1;
-  stroke-width: 2;
+/* ── Cards genéricos ─────────────────────────────────────── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  transition: background 0.25s, border-color 0.25s;
 }
+.card:hover { background: var(--card-hover); }
+
+/* ── Inputs ──────────────────────────────────────────────── */
+.t-input {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+
+/* ── Páginas (fundo principal) ───────────────────────────── */
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  transition: background 0.25s;
+}
+
+/* ── React Flow ──────────────────────────────────────────── */
+.react-flow__background { background: var(--bg) !important; }
+
+.react-flow__edge-path { stroke: #6366f1; stroke-width: 2; }
 
 .react-flow__edge.selected .react-flow__edge-path,
 .react-flow__edge:focus .react-flow__edge-path {
-  stroke: #fff !important;
+  stroke: var(--accent) !important;
   stroke-width: 3 !important;
   filter: drop-shadow(0 0 6px #6366f1);
 }
@@ -73,10 +114,7 @@ body {
   stroke-dasharray: 5;
   animation: dashdraw 0.5s linear infinite;
 }
-
-@keyframes dashdraw {
-  to { stroke-dashoffset: -10; }
-}
+@keyframes dashdraw { to { stroke-dashoffset: -10; } }
 
 .react-flow__controls {
   background: var(--bg3) !important;
@@ -85,32 +123,23 @@ body {
   overflow: hidden;
   box-shadow: 0 4px 24px var(--shadow);
 }
-
 .react-flow__controls-button {
   background: var(--bg3) !important;
   border-bottom: 1px solid var(--border) !important;
   fill: var(--text3) !important;
 }
-
 .react-flow__controls-button:hover {
   background: var(--bg2) !important;
   fill: var(--text2) !important;
 }
-
 .react-flow__minimap {
   background: var(--bg3) !important;
   border: 1px solid var(--border) !important;
   border-radius: 12px;
 }
 
-/* ── Tema claro — inverte luminosidade do app inteiro ────── */
-[data-theme="light"] #root {
-  filter: invert(1) hue-rotate(180deg);
-}
-
-/* Imagens e avatares ficam normais (inverte de volta) */
-[data-theme="light"] img,
-[data-theme="light"] .react-flow__minimap,
-[data-theme="light"] video {
-  filter: invert(1) hue-rotate(180deg);
-}
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text5); }

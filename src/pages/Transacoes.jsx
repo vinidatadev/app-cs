@@ -39,7 +39,7 @@ export default function Transacoes() {
   })
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0f17' }}>
+    <div className="page">
       <Navbar />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '80px 24px 48px' }}>
@@ -47,10 +47,10 @@ export default function Transacoes() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
           <div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: 26, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.02em' }}>
               Transações
             </h1>
-            <p style={{ fontSize: 13, color: '#475569', marginTop: 4 }}>
+            <p style={{ fontSize: 13, color: 'var(--text5)', marginTop: 4 }}>
               {transacoes.length} transação{transacoes.length !== 1 ? 'ões' : ''} cadastrada{transacoes.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -68,22 +68,22 @@ export default function Transacoes() {
 
         {/* Busca */}
         <div style={{ position: 'relative', marginBottom: 24 }}>
-          <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 16, color: '#475569' }}>🔍</span>
+          <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', fontSize: 16, color: 'var(--text5)' }}>🔍</span>
           <input
             value={busca}
             onChange={e => setBusca(e.target.value)}
             placeholder="Buscar por transação, módulo ou descrição..."
             style={{
-              width: '100%', background: '#1e1e2e', border: '1px solid #2d2d44',
+              width: '100%', background: 'var(--bg3)', border: '1px solid var(--border)',
               borderRadius: 12, padding: '12px 16px 12px 42px',
-              color: '#e2e8f0', fontSize: 14, fontFamily: 'Inter, sans-serif',
+              color: 'var(--text)', fontSize: 14, fontFamily: 'Inter, sans-serif',
               outline: 'none', boxSizing: 'border-box',
             }}
           />
           {busca && (
             <button onClick={() => setBusca('')} style={{
               position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: 16,
+              background: 'none', border: 'none', color: 'var(--text5)', cursor: 'pointer', fontSize: 16,
             }}>✕</button>
           )}
         </div>
@@ -92,7 +92,7 @@ export default function Transacoes() {
         {loading ? (
           <div style={{ textAlign: 'center', color: '#6366f1', padding: 48, fontSize: 15 }}>Carregando...</div>
         ) : filtradas.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#475569', padding: 64 }}>
+          <div style={{ textAlign: 'center', color: 'var(--text5)', padding: 64 }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
             <p>{busca ? 'Nenhuma transação encontrada' : 'Nenhuma transação cadastrada ainda'}</p>
           </div>
@@ -104,7 +104,7 @@ export default function Transacoes() {
               padding: '8px 20px', gap: 16,
             }}>
               {['Transação', 'Módulo', 'Descrição', ''].map(h => (
-                <span key={h} style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</span>
+                <span key={h} style={{ fontSize: 11, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</span>
               ))}
             </div>
 
@@ -176,7 +176,7 @@ function TransacaoRow({ transacao: t, busca, onClick }) {
         transition: 'all 0.15s',
       }}
     >
-      <span style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9' }}>
+      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text2)' }}>
         {highlight(t.transacao, busca)}
       </span>
       <span style={{
@@ -187,10 +187,10 @@ function TransacaoRow({ transacao: t, busca, onClick }) {
       }}>
         {highlight(t.modulo, busca)}
       </span>
-      <span style={{ fontSize: 13, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 13, color: 'var(--text3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {highlight(t.descricao, busca)}
       </span>
-      <span style={{ color: '#475569', fontSize: 13 }}>→</span>
+      <span style={{ color: 'var(--text5)', fontSize: 13 }}>→</span>
     </div>
   )
 }
