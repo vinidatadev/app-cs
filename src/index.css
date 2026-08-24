@@ -103,8 +103,14 @@ body {
   border-radius: 12px;
 }
 
-/* ── Scrollbar ───────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text5); }
+/* ── Tema claro — inverte luminosidade do app inteiro ────── */
+[data-theme="light"] #root {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Imagens e avatares ficam normais (inverte de volta) */
+[data-theme="light"] img,
+[data-theme="light"] .react-flow__minimap,
+[data-theme="light"] video {
+  filter: invert(1) hue-rotate(180deg);
+}
