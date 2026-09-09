@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar'
 import CapacitacaoPorPessoa from '../components/capacitacao/PorPessoa'
 import CapacitacaoPorCurso from '../components/capacitacao/PorCurso'
 import GerenciarCursos from '../components/capacitacao/GerenciarCursos'
+import Ranking from '../components/capacitacao/Ranking'
 
 export default function Capacitacao() {
   const { perm } = useAuth()
@@ -83,9 +84,9 @@ export default function Capacitacao() {
             <span style={{ fontSize: 11, color: 'var(--text5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4 }}>Setor:</span>
             {setores.map(s => (
               <button key={s} onClick={() => setSetorFiltro(s)} style={{
-                background: setorFiltro === s ? '#6366f1' : '#161622',
+                background: setorFiltro === s ? '#6366f1' : 'var(--bg2)',
                 border: `1px solid ${setorFiltro === s ? '#6366f1' : 'var(--border)'}`,
-                color: setorFiltro === s ? '#fff' : '#64748b',
+                color: setorFiltro === s ? '#fff' : 'var(--text4)',
                 borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
               }}>{s}</button>
@@ -98,6 +99,7 @@ export default function Capacitacao() {
           {[
             ['pessoa', '👤 Por Pessoa'],
             ['curso', '📚 Por Curso'],
+            ['ranking', '🏆 Ranking'],
             ...(canEdit ? [['gerenciar', '⚙ Cursos']] : []),
           ].map(([key, label]) => (
             <button key={key} onClick={() => setTab(key)} style={{
@@ -121,6 +123,8 @@ export default function Capacitacao() {
           />
         ) : tab === 'curso' ? (
           <CapacitacaoPorCurso users={usersFiltrados} cursos={cursos} progressos={progressos} onSetStatus={canEdit ? setStatus : null} />
+        ) : tab === 'ranking' ? (
+          <Ranking users={usersFiltrados} cursos={cursos} progressos={progressos} />
         ) : canEdit ? (
           <GerenciarCursos cursos={cursos} onRefresh={fetchAll} />
         ) : null}

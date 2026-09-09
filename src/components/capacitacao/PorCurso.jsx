@@ -47,9 +47,9 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {categorias.map(cat => (
             <button key={cat} onClick={() => setCategoriaFiltro(cat)} style={{
-              background: categoriaFiltro === cat ? '#6366f1' : '#161622',
+              background: categoriaFiltro === cat ? '#6366f1' : 'var(--bg2)',
               border: `1px solid ${categoriaFiltro === cat ? '#6366f1' : 'var(--border)'}`,
-              color: categoriaFiltro === cat ? '#fff' : '#64748b',
+              color: categoriaFiltro === cat ? '#fff' : 'var(--text4)',
               borderRadius: 20, padding: '5px 14px', fontSize: 11, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
             }}>{cat}</button>
