@@ -5,7 +5,7 @@ const POWER_BI = [
   {
     nome: 'Carteira OTIF',
     descricao: 'Acompanhamento de On Time In Full da carteira de pedidos',
-    url: 'https://app.powerbi.com/groups/415e55ea-c94e-4402-b9ca-5ec9639c2a97/reports/34aa937c-7ddf-48ec-8ba0-b1b98b2a67d0?experience=power-bi',
+    url: 'https://app.powerbi.com/groups/4b415bf9-c0bf-4ce1-942a-6d7d4f8f6a5a/reports/79d8d241-c1ea-4ce3-b858-d805c202b466/ReportSectionaed8133f45cc0beb8950?language=pt-BR&experience=power-bi',
     icone: '📦',
     cor: '#f59e0b',
   },
