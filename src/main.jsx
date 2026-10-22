@@ -18,7 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <ThemeProvider>
         <Routes>
-          <Route path="/" element={<Navigate to="/organograma" replace />} />
+          <Route path="/" element={<Navigate to="/links" replace />} />
           <Route path="/login" element={<Login />} />
 
           <Route path="/organograma" element={

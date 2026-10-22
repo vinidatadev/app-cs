@@ -22,7 +22,7 @@ export default function Login() {
     } else {
       // Login ok — navega para o organograma
       // O AuthContext vai carregar os dados do usuário via onAuthStateChange
-      navigate('/organograma', { replace: true })
+      navigate('/links', { replace: true })
     }
   }
 

@@ -53,6 +53,14 @@ export function AuthProvider({ children }) {
     setPermissoes(null)
   }
 
+  async function refreshUser() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.user) {
+      const { data } = await supabase.from('user').select('*').eq('id_user', session.user.id).single()
+      setUser(data || null)
+    }
+  }
+
   const isAdmin = user?.nivel === 2
 
   // Helpers de permissão
@@ -76,7 +84,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, permissoes, perm, isAdmin, loading, logout }}>
+    <AuthContext.Provider value={{ user, permissoes, perm, isAdmin, loading, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

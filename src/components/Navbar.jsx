@@ -1,17 +1,21 @@
 import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import PerfilModal from './PerfilModal'
 
 const FLOWCHECK_URL = import.meta.env.VITE_FLOWCHECK_URL || 'http://localhost:5174'
 
 export default function Navbar() {
   const { user, perm, isAdmin, logout } = useAuth()
   const { theme, toggle } = useTheme()
+  const [showPerfil, setShowPerfil] = useState(false)
 
   const initials = (user?.nome_usuario || '?')
     .split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 
   return (
+    <>
     <nav className="navbar" style={{
       position: 'fixed', top: 0, left: 0, right: 0, height: 52,
       display: 'flex', alignItems: 'center', padding: '0 24px', gap: 8, zIndex: 1000,
@@ -68,21 +72,30 @@ export default function Navbar() {
 
       {/* Info do usuário + logout */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{
-          width: 30, height: 30, borderRadius: '50%',
-          background: '#312e81', border: '2px solid #6366f133',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          overflow: 'hidden', flexShrink: 0,
-        }}>
-          {user?.foto
-            ? <img src={user.foto} alt={user.nome_usuario} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            : <span style={{ color: '#6366f1', fontWeight: 700, fontSize: 11 }}>{initials}</span>
-          }
-        </div>
+        <button
+          onClick={() => setShowPerfil(true)}
+          title="Editar perfil"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        >
+          <div style={{
+            width: 30, height: 30, borderRadius: '50%',
+            background: '#312e81', border: '2px solid #6366f133',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden', flexShrink: 0, transition: 'border-color 0.15s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = '#6366f1'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = '#6366f133'}
+          >
+            {user?.foto
+              ? <img src={user.foto} alt={user.nome_usuario} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span style={{ color: '#6366f1', fontWeight: 700, fontSize: 11 }}>{initials}</span>
+            }
+          </div>
 
-        <span style={{ fontSize: 13, color: 'var(--text3)', fontWeight: 500, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {user?.nome_usuario || user?.cargo || ''}
-        </span>
+          <span style={{ fontSize: 13, color: 'var(--text3)', fontWeight: 500, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {user?.nome_usuario || user?.cargo || ''}
+          </span>
+        </button>
 
         <button
           onClick={toggle}
@@ -116,6 +129,9 @@ export default function Navbar() {
         </button>
       </div>
     </nav>
+
+    {showPerfil && <PerfilModal onClose={() => setShowPerfil(false)} />}
+    </>
   )
 }
 

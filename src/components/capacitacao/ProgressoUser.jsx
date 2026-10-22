@@ -132,8 +132,15 @@ export default function ProgressoUser({ user, cursos, progressos, onSetStatus, o
                 return (
                   <div key={curso.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 10, background: 'var(--bg)', border: '1px solid var(--border)' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 500, color: status === 'concluido' ? '#64748b' : '#e2e8f0', textDecoration: status === 'concluido' ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {curso.curso}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: curso.carga_horaria ? 2 : 0 }}>
+                        <div style={{ fontSize: 12, fontWeight: 500, color: status === 'concluido' ? '#64748b' : '#e2e8f0', textDecoration: status === 'concluido' ? 'line-through' : 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {curso.curso}
+                        </div>
+                        {curso.link && (
+                          <a href={curso.link} target="_blank" rel="noopener noreferrer" title="Acessar curso"
+                            style={{ color: '#6366f1', fontSize: 11, textDecoration: 'none', lineHeight: 1, flexShrink: 0, background: '#6366f118', border: '1px solid #6366f133', borderRadius: 4, padding: '1px 4px' }}
+                          >🔗</a>
+                        )}
                       </div>
                       {curso.carga_horaria && <div style={{ fontSize: 10, color: 'var(--text5)' }}>⏱ {curso.carga_horaria}</div>}
                     </div>

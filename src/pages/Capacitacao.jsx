@@ -79,8 +79,33 @@ export default function Capacitacao() {
             </p>
           </div>
 
-          {/* Filtro de setor */}
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Botão Trilhar */}
+            <a
+              href="https://trilhar.edusense.app/#/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Acessar plataforma Trilhar"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                background: '#ffffff', border: '1px solid #e2e8f0',
+                borderRadius: 20, padding: '7px 16px', textDecoration: 'none',
+                transition: 'border-color 0.15s, box-shadow 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#6366f155'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(99,102,241,0.15)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = 'none' }}
+            >
+              <img
+                src="https://trilhar.edusense.app/api/login-theme-v1/images/img.logoicon.png"
+                alt="Trilhar"
+                style={{ height: 22, width: 'auto', objectFit: 'contain' }}
+                onError={e => { e.target.style.display = 'none' }}
+              />
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', fontFamily: 'Inter, sans-serif' }}>Trilhar</span>
+            </a>
+
+            {/* Filtro de setor */}
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{ fontSize: 11, color: 'var(--text5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4 }}>Setor:</span>
             {setores.map(s => (
               <button key={s} onClick={() => setSetorFiltro(s)} style={{
@@ -91,6 +116,7 @@ export default function Capacitacao() {
                 cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
               }}>{s}</button>
             ))}
+          </div>
           </div>
         </div>
 

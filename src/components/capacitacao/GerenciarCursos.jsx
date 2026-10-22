@@ -17,7 +17,7 @@ const CATEGORIAS = [
 // Sugestões rápidas (não obrigatórias)
 const NIVEL_SUGESTOES = ['Assistente', 'Junior', 'Pleno', 'Senior', 'Todos']
 
-const EMPTY = { curso: '', descricao: '', conteudo: '', carga_horaria: '', categoria: '', nivel: '', ativo: true }
+const EMPTY = { curso: '', descricao: '', conteudo: '', carga_horaria: '', categoria: '', nivel: '', link: '', ativo: true }
 
 export default function GerenciarCursos({ cursos, onRefresh }) {
   const [busca, setBusca] = useState('')
@@ -55,13 +55,13 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
       await supabase.from('curso').insert({
         curso: form.curso, descricao: form.descricao, conteudo: form.conteudo,
         carga_horaria: form.carga_horaria, categoria: form.categoria,
-        nivel: form.nivel, ativo: form.ativo,
+        nivel: form.nivel, link: form.link || null, ativo: form.ativo,
       })
     } else {
       await supabase.from('curso').update({
         curso: form.curso, descricao: form.descricao, conteudo: form.conteudo,
         carga_horaria: form.carga_horaria, categoria: form.categoria,
-        nivel: form.nivel, ativo: form.ativo,
+        nivel: form.nivel, link: form.link || null, ativo: form.ativo,
       }).eq('id', modal.curso.id)
     }
     setSaving(false)
@@ -115,15 +115,15 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
       {/* Tabela */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {/* Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px 100px', gap: 12, padding: '6px 16px' }}>
-          {['Curso', 'Categoria', 'Nível', 'Carga', ''].map(h => (
-            <span key={h} style={{ fontSize: 10, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px 32px 100px', gap: 12, padding: '6px 16px' }}>
+          {['Curso', 'Categoria', 'Nível', 'Carga', '', ''].map((h, i) => (
+            <span key={i} style={{ fontSize: 10, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</span>
           ))}
         </div>
 
         {filtrados.map(curso => (
           <div key={curso.id} style={{
-            display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px 100px',
+            display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px 32px 100px',
             gap: 12, padding: '12px 16px', alignItems: 'center',
             background: curso.ativo ? 'var(--bg2)' : 'var(--bg)',
             border: `1px solid ${curso.ativo ? 'var(--border)' : 'var(--bg3)'}`,
@@ -153,6 +153,14 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
               }
             </div>
             <span style={{ fontSize: 11, color: 'var(--text5)' }}>{curso.carga_horaria || '—'}</span>
+
+            {/* Link */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {curso.link
+                ? <a href={curso.link} target="_blank" rel="noopener noreferrer" title="Acessar curso" onClick={e => e.stopPropagation()} style={{ color: '#6366f1', fontSize: 15, textDecoration: 'none', lineHeight: 1 }}>🔗</a>
+                : <span style={{ color: 'var(--text5)', fontSize: 13 }}>—</span>
+              }
+            </div>
 
             {/* Ações */}
             <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
@@ -208,6 +216,11 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
               <Field label="Carga horária">
                 <input value={form.carga_horaria} onChange={e => set('carga_horaria', e.target.value)}
                   placeholder="Ex: 00:30:00" style={inputStyle} />
+              </Field>
+
+              <Field label="Link do curso">
+                <input value={form.link} onChange={e => set('link', e.target.value)}
+                  placeholder="https://..." style={inputStyle} />
               </Field>
 
               <Field label="Descrição">

@@ -75,7 +75,16 @@ export default function PorCurso({ users, cursos, progressos, onSetStatus }) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text2)', lineHeight: 1.3, marginBottom: 4 }}>{curso.curso}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text2)', lineHeight: 1.3 }}>{curso.curso}</div>
+                      {curso.link && (
+                        <a href={curso.link} target="_blank" rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          title="Acessar curso"
+                          style={{ color: '#6366f1', fontSize: 13, lineHeight: 1, flexShrink: 0, textDecoration: 'none', background: '#6366f118', border: '1px solid #6366f133', borderRadius: 6, padding: '1px 6px' }}
+                        >🔗</a>
+                      )}
+                    </div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {curso.categoria && <Tag label={curso.categoria} color="#6366f1" />}
                       {curso.nivel && <Tag label={curso.nivel} color={NIVEL_COLOR[curso.nivel] || '#64748b'} />}
