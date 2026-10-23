@@ -63,6 +63,9 @@ export default function Navbar() {
       {perm.canView('organograma') && (
         <NavLink to="/organograma" style={navLinkStyle}>Organograma</NavLink>
       )}
+      {perm.canView('indicadores') && (
+        <NavLink to="/indicadores" style={navLinkStyle}>Indicadores</NavLink>
+      )}
       {isAdmin && (
         <NavLink to="/admin" style={navLinkStyle}>⚙ Admin</NavLink>
       )}

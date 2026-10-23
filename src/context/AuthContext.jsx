@@ -70,15 +70,19 @@ export function AuthProvider({ children }) {
     transacoes:  isAdmin ? 'editor' : (permissoes?.transacoes  ?? 'none'),
     capacitacao: isAdmin ? 'editor' : (permissoes?.capacitacao ?? 'none'),
     links:       isAdmin ? true     : (permissoes?.links       ?? false),
+    // indicadores: acesso por setor 'Customer Service' ou admin
+    indicadores: isAdmin ? 'editor' : (user?.setor === 'Customer Service' ? 'viewer' : 'none'),
 
     canView: (modulo) => {
       if (isAdmin) return true
+      if (modulo === 'indicadores') return user?.setor === 'Customer Service'
       const v = permissoes?.[modulo]
       if (modulo === 'links') return v === true
       return v === 'viewer' || v === 'editor'
     },
     canEdit: (modulo) => {
       if (isAdmin) return true
+      if (modulo === 'indicadores') return user?.setor === 'Customer Service'
       return permissoes?.[modulo] === 'editor'
     },
   }

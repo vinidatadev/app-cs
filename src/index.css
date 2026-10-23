@@ -143,3 +143,20 @@ body {
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text5); }
+
+/* ── Tiptap editor ───────────────────────────────────────── */
+.tiptap { outline: none; min-height: 80px; font-size: 13px; line-height: 1.6; color: var(--text); }
+.tiptap p { margin: 0 0 6px; }
+.tiptap h2 { font-size: 15px; font-weight: 700; color: var(--text2); margin: 10px 0 6px; }
+.tiptap ul, .tiptap ol { padding-left: 20px; margin-bottom: 6px; }
+.tiptap li { margin-bottom: 2px; }
+.tiptap strong { font-weight: 700; }
+.tiptap em { font-style: italic; }
+.tiptap s { text-decoration: line-through; }
+.tiptap u { text-decoration: underline; }
+.tiptap img { max-width: 100%; border-radius: 8px; margin: 6px 0; }
+.tiptap-view { font-size: 13px; line-height: 1.6; color: var(--text); }
+.tiptap-view p { margin: 0 0 6px; }
+.tiptap-view h2 { font-size: 15px; font-weight: 700; color: var(--text2); margin: 10px 0 6px; }
+.tiptap-view ul, .tiptap-view ol { padding-left: 20px; margin-bottom: 6px; }
+.tiptap-view img { max-width: 100%; border-radius: 8px; margin: 6px 0; }

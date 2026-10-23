@@ -10,6 +10,8 @@ import Transacoes from './pages/Transacoes'
 import Capacitacao from './pages/Capacitacao'
 import Links from './pages/Links'
 import AdminUsuarios from './pages/AdminUsuarios'
+import Indicadores from './pages/Indicadores'
+import IndicadoresGrupo from './pages/IndicadoresGrupo'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -50,6 +52,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/admin" element={
             <ProtectedRoute>
               <AdminUsuarios />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/indicadores" element={
+            <ProtectedRoute modulo="indicadores">
+              <Indicadores />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/indicadores/:id" element={
+            <ProtectedRoute modulo="indicadores">
+              <IndicadoresGrupo />
             </ProtectedRoute>
           } />
         </Routes>
