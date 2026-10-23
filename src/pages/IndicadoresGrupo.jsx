@@ -6,6 +6,7 @@ import GraficoSubgrupo from '../components/indicadores/GraficoSubgrupo'
 import NotasEditor from '../components/indicadores/NotasEditor'
 import TarefasPanel from '../components/indicadores/TarefasPanel'
 import GrupoAdmin from '../components/indicadores/GrupoAdmin'
+import RelatorioBiModal from '../components/indicadores/RelatorioBiModal'
 import { useGrupoData } from '../hooks/useIndicadores'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../supabase'
@@ -21,9 +22,10 @@ export default function IndicadoresGrupo() {
   const [subgrupoAtivo, setSubgrupoAtivo] = useState(null)
   const [secao, setSecao] = useState('indicadores') // 'indicadores' | 'tarefas'
   const [editandoGrupo, setEditandoGrupo] = useState(false)
+  const [showBi, setShowBi] = useState(false)
   const [usersGlobal, setUsersGlobal] = useState([])
 
-  const { grupo, valores, users, loading, refresh } = useGrupoData(Number(id), ano)
+  const { grupo, valores, comentarios, users, loading, refresh } = useGrupoData(Number(id), ano)
 
   useEffect(() => {
     supabase.from('user').select('id_user, nome_usuario, foto, cargo').order('nome_usuario')
@@ -86,6 +88,9 @@ export default function IndicadoresGrupo() {
             </h1>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button onClick={() => setShowBi(true)} style={{ ...btnSecondary, color: '#6366f1', borderColor: '#6366f155' }}>
+              Abrir BI
+            </button>
             {/* Seletor de ano */}
             <select value={ano} onChange={e => setAno(Number(e.target.value))} style={selectStyle}>
               {ANOS.map(a => <option key={a} value={a}>{a}</option>)}
@@ -148,6 +153,7 @@ export default function IndicadoresGrupo() {
               ano={ano}
               onUpdate={refresh}
               users={usersGlobal}
+              comentarios={comentarios}
               canEdit={canEdit}
             />
             <GraficoSubgrupo
@@ -161,6 +167,7 @@ export default function IndicadoresGrupo() {
                 idGrupo={grupo.id}
                 idSubgrupo={subAtivo.id}
                 canEdit={canEdit}
+                users={usersGlobal}
               />
             </div>
           </>
@@ -185,6 +192,8 @@ export default function IndicadoresGrupo() {
           onSave={() => { refresh(); setEditandoGrupo(false) }}
         />
       )}
+
+      {showBi && <RelatorioBiModal onClose={() => setShowBi(false)} />}
     </div>
   )
 }

@@ -41,6 +41,7 @@ export default function GrupoAdmin({ grupo, users, onClose, onSave }) {
         ind_indicador: [...s.ind_indicador, {
           id: null, nome: '', tipo: 'numero',
           tipo_grafico: null, cor_grafico: CORES[s.ind_indicador.length % CORES.length],
+          painel_grafico: 1,
           ordem: s.ind_indicador.length, _new: true,
         }],
       }
@@ -110,13 +111,15 @@ export default function GrupoAdmin({ grupo, users, onClose, onSave }) {
             await supabase.from('ind_indicador').insert({
               id_subgrupo: sId, nome: ind.nome, tipo: ind.tipo,
               tipo_grafico: ind.tipo_grafico || null,
-              cor_grafico: ind.cor_grafico || null, ordem: ii,
+              cor_grafico: ind.cor_grafico || null,
+              painel_grafico: Number(ind.painel_grafico) || 1, ordem: ii,
             })
           } else {
             await supabase.from('ind_indicador').update({
               nome: ind.nome, tipo: ind.tipo,
               tipo_grafico: ind.tipo_grafico || null,
-              cor_grafico: ind.cor_grafico || null, ordem: ii,
+              cor_grafico: ind.cor_grafico || null,
+              painel_grafico: Number(ind.painel_grafico) || 1, ordem: ii,
             }).eq('id', ind.id)
           }
         }
@@ -196,7 +199,7 @@ export default function GrupoAdmin({ grupo, users, onClose, onSave }) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {s.ind_indicador.map((ind, ii) => (
-                <div key={ii} style={{ display: 'grid', gridTemplateColumns: '2fr 100px 90px 40px 28px', gap: 6, alignItems: 'center' }}>
+                <div key={ii} style={{ display: 'grid', gridTemplateColumns: '2fr 92px 88px 92px 36px 24px', gap: 6, alignItems: 'center' }}>
                   <input value={ind.nome} onChange={e => updateIndicador(tab, ii, 'nome', e.target.value)}
                     style={{ ...inputStyle, fontSize: 12 }} placeholder="Nome do indicador" />
                   <select value={ind.tipo} onChange={e => updateIndicador(tab, ii, 'tipo', e.target.value)} style={{ ...inputStyle, fontSize: 12 }}>
@@ -208,10 +211,19 @@ export default function GrupoAdmin({ grupo, users, onClose, onSave }) {
                     <option value="barra">Barra</option>
                     <option value="linha">Linha</option>
                   </select>
+                  <select
+                    value={ind.painel_grafico || 1}
+                    onChange={e => updateIndicador(tab, ii, 'painel_grafico', Number(e.target.value))}
+                    style={{ ...inputStyle, fontSize: 12 }}
+                    title="Gráfico em que o indicador aparece"
+                  >
+                    <option value={1}>Gráfico 1</option>
+                    <option value={2}>Gráfico 2</option>
+                  </select>
                   <input type="color" value={ind.cor_grafico || '#6366f1'}
                     onChange={e => updateIndicador(tab, ii, 'cor_grafico', e.target.value)}
                     style={{ width: 36, height: 28, border: 'none', borderRadius: 6, cursor: 'pointer', background: 'none' }} />
-                  <button onClick={() => removeIndicador(tab, ii)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                  <button onClick={() => removeIndicador(tab, ii)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 14 }}>x</button>
                 </div>
               ))}
               <button onClick={() => addIndicador(tab)} style={{
@@ -240,7 +252,7 @@ const overlay = {
 }
 const modal = {
   background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 16,
-  padding: 24, width: '100%', maxWidth: 680, maxHeight: '90vh', overflowY: 'auto',
+  padding: 24, width: '100%', maxWidth: 760, maxHeight: '90vh', overflowY: 'auto',
 }
 const labelStyle = { display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--text5)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }
 const inputStyle = {

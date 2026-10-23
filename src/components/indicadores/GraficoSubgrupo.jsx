@@ -1,21 +1,19 @@
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, LabelList, Cell,
+  Tooltip, Legend, ResponsiveContainer, LabelList,
 } from 'recharts'
+import { formatNumeroBR } from '../../utils/numeros'
 
 const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
 
-// Indicadores de número vão pro eixo esquerdo
-// Indicadores de percentual vão pro eixo direito (0-100 fixo)
 function yAxisId(ind) {
   return ind.tipo === 'percentual' ? 'right' : 'left'
 }
 
-// Label inline nas barras
 function BarLabel({ x, y, width, value, tipo }) {
   if (value === null || value === undefined) return null
   const text = tipo === 'percentual'
-    ? `${Math.round(value)}%`
+    ? formatNumeroBR(value, { percentual: true })
     : Number(value).toLocaleString('pt-BR')
   return (
     <text
@@ -25,10 +23,9 @@ function BarLabel({ x, y, width, value, tipo }) {
   )
 }
 
-// Dot customizado para linha — mostra o valor em cima
 function LineDot({ cx, cy, value, cor, tipo }) {
   if (value === null || value === undefined) return null
-  const text = tipo === 'percentual' ? `${Math.round(value)}%` : Number(value).toLocaleString('pt-BR')
+  const text = tipo === 'percentual' ? formatNumeroBR(value, { percentual: true }) : Number(value).toLocaleString('pt-BR')
   return (
     <g>
       <circle cx={cx} cy={cy} r={4} fill={cor} stroke="#0f0f17" strokeWidth={1.5} />
@@ -41,13 +38,38 @@ function LineDot({ cx, cy, value, cor, tipo }) {
 }
 
 export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
-  const indicadores = (subgrupo.ind_indicador || []).filter(i => i.tipo_grafico)
-  if (indicadores.length === 0) return null
+  const comGrafico = (subgrupo.ind_indicador || []).filter(i => i.tipo_grafico)
+  if (comGrafico.length === 0) return null
 
-  const temNumero    = indicadores.some(i => i.tipo !== 'percentual')
+  const paineis = [1, 2]
+    .map(p => ({
+      painel: p,
+      indicadores: comGrafico.filter(i => (Number(i.painel_grafico) || 1) === p),
+    }))
+    .filter(p => p.indicadores.length > 0)
+
+  if (paineis.length === 0) return null
+
+  return (
+    <>
+      {paineis.map(p => (
+        <GraficoPainel
+          key={p.painel}
+          subgrupo={subgrupo}
+          indicadores={p.indicadores}
+          valores={valores}
+          painel={p.painel}
+          mostrarPainel={paineis.length > 1}
+        />
+      ))}
+    </>
+  )
+}
+
+function GraficoPainel({ subgrupo, indicadores, valores, painel, mostrarPainel }) {
+  const temNumero = indicadores.some(i => i.tipo !== 'percentual')
   const temPercentual = indicadores.some(i => i.tipo === 'percentual')
 
-  // Monta os dados por mês
   const data = MESES.map((mes, idx) => {
     const mesNum = idx + 1
     const ponto = { mes }
@@ -58,17 +80,15 @@ export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
     return ponto
   })
 
-  // Só mostra meses com pelo menos um valor
   const dataFiltrada = data.filter(d => indicadores.some(ind => d[ind.nome] !== null))
   if (dataFiltrada.length === 0) return null
 
-  // Calcula domínio do eixo esquerdo com 10% de folga no topo
   const numValues = indicadores
     .filter(i => i.tipo !== 'percentual')
     .flatMap(ind => dataFiltrada.map(d => d[ind.nome]).filter(v => v !== null))
 
   const maxNum = numValues.length > 0 ? Math.max(...numValues) : 100
-  const leftDomain = [0, Math.ceil(maxNum * 1.15)] // 15% de espaço pro label
+  const leftDomain = [0, Math.ceil(maxNum * 1.15)]
 
   return (
     <div style={{
@@ -80,6 +100,13 @@ export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
         marginBottom: 20, textAlign: 'center', letterSpacing: '0.04em',
       }}>
         {subgrupo.nome.toUpperCase()}
+        {mostrarPainel && (
+          <span style={{
+            marginLeft: 8, fontSize: 10, fontWeight: 700, color: '#6366f1',
+            background: '#6366f122', borderRadius: 4, padding: '2px 7px',
+            letterSpacing: '0.06em', verticalAlign: 'middle',
+          }}>GRÁFICO {painel}</span>
+        )}
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
@@ -92,7 +119,6 @@ export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
             axisLine={false} tickLine={false}
           />
 
-          {/* Eixo esquerdo — valores numéricos (ex: QTD, VOLUME) */}
           {temNumero && (
             <YAxis
               yAxisId="left"
@@ -108,7 +134,6 @@ export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
             />
           )}
 
-          {/* Eixo direito — percentual SEMPRE fixo 0–100 */}
           {temPercentual && (
             <YAxis
               yAxisId="right"
@@ -122,7 +147,6 @@ export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
             />
           )}
 
-          {/* Quando só tem percentual, usa eixo esquerdo como percentual */}
           {!temNumero && temPercentual && (
             <YAxis
               yAxisId="left"
@@ -145,7 +169,7 @@ export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
               const ind = indicadores.find(i => i.nome === name)
               if (!ind || value === null) return ['-', name]
               const fmt = ind.tipo === 'percentual'
-                ? `${Math.round(value)}%`
+                ? formatNumeroBR(value, { percentual: true })
                 : Number(value).toLocaleString('pt-BR')
               return [fmt, name]
             }}
@@ -158,7 +182,6 @@ export default function GraficoSubgrupo({ subgrupo, valores, ano }) {
             )}
           />
 
-          {/* Renderiza cada indicador na série correta */}
           {indicadores.map(ind => {
             const axis = !temNumero ? 'left' : yAxisId(ind)
             const cor = ind.cor_grafico || '#6366f1'

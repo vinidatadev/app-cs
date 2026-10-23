@@ -32,8 +32,9 @@ create table if not exists public.ind_indicador (
   id_subgrupo    int  not null references public.ind_subgrupo(id) on delete cascade,
   nome           text not null,
   tipo           text not null default 'numero' check (tipo in ('numero','percentual')),
-  tipo_grafico   text          default null    check (tipo_grafico in ('barra','linha', null)),
-  cor_grafico    text          default null,   -- hex, ex: '#6366f1'
+    tipo_grafico   text          default null    check (tipo_grafico in ('barra','linha', null)),
+    cor_grafico    text          default null,   -- hex, ex: '#6366f1'
+    painel_grafico int  not null default 1 check (painel_grafico between 1 and 2),
   ordem          int  not null default 0,
   criado_em      timestamptz not null default now()
 );
@@ -322,6 +323,7 @@ create policy "ind_nota insert" on public.ind_nota
   );
 
 -- edição: somente nota ativa + (admin ou responsável do subgrupo/grupo)
+-- o WITH CHECK precisa permitir gravar status = 'arquivada' ao finalizar a nota
 create policy "ind_nota update" on public.ind_nota
   for update using (
     status = 'ativa'
@@ -330,6 +332,11 @@ create policy "ind_nota update" on public.ind_nota
       or autor_id = auth.uid()::text
       or (id_subgrupo is not null and public.is_responsavel_subgrupo(id_subgrupo))
     )
+  )
+  with check (
+    public.is_admin()
+    or autor_id = auth.uid()::text
+    or (id_subgrupo is not null and public.is_responsavel_subgrupo(id_subgrupo))
   );
 
 

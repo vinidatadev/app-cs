@@ -9,19 +9,21 @@ import { useAuth } from '../../context/AuthContext'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 
-export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }) {
+export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit, users }) {
   const { user } = useAuth()
   const [notas, setNotas] = useState([])
   const [notaAtiva, setNotaAtiva] = useState(null)
+  const [notasAntigas, setNotasAntigas] = useState([])
   const [visualizando, setVisualizando] = useState(null)
-  const [showHistorico, setShowHistorico] = useState(false)
+  const [confirmandoNova, setConfirmandoNova] = useState(false)
   const [criandoNova, setCriandoNova] = useState(false)
-  const [tituloAtivo, setTituloAtivo] = useState('') // título da nota em edição
-  const [titulo, setTitulo] = useState('') // título do form de nova nota
+  const [tituloAtivo, setTituloAtivo] = useState('')
+  const [titulo, setTitulo] = useState('')
   const [mesRef, setMesRef] = useState('')
   const [anoRef, setAnoRef] = useState(new Date().getFullYear())
   const [anexos, setAnexos] = useState([])
   const [saving, setSaving] = useState(false)
+  const [erro, setErro] = useState('')
   const fileRef = useRef()
 
   const editor = useEditor({
@@ -31,8 +33,8 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Image,
     ],
-    content: notaAtiva?.conteudo_html || '',
-    editable: canEdit && !!notaAtiva,
+    content: '',
+    editable: false,
   })
 
   useEffect(() => { fetchNotas() }, [referencia, idGrupo, idSubgrupo])
@@ -42,53 +44,83 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }
     if (notaAtiva) {
       editor.commands.setContent(notaAtiva.conteudo_html || '')
       editor.setEditable(canEdit && notaAtiva.status === 'ativa')
+    } else {
+      editor.commands.setContent('')
+      editor.setEditable(false)
     }
-  }, [notaAtiva, editor])
+  }, [notaAtiva, editor, canEdit])
+
+  function nomeAutor(autorId) {
+    if (!autorId) return ''
+    return users?.find(u => u.id_user === autorId)?.nome_usuario || autorId
+  }
+
+  function escopo(q) {
+    let query = q.eq('referencia', referencia)
+    if (idGrupo) query = query.eq('id_grupo', idGrupo)
+    if (idSubgrupo) query = query.eq('id_subgrupo', idSubgrupo)
+    return query
+  }
 
   async function fetchNotas() {
-    let q = supabase.from('ind_nota')
-      .select('*, ind_nota_anexo(*)')
-      .eq('referencia', referencia)
-      .order('criado_em', { ascending: false })
+    const { data, error } = await escopo(
+      supabase.from('ind_nota').select('*, ind_nota_anexo(*)')
+    ).order('criado_em', { ascending: false })
 
-    if (idGrupo)    q = q.eq('id_grupo', idGrupo)
-    if (idSubgrupo) q = q.eq('id_subgrupo', idSubgrupo)
-
-    const { data } = await q
-    setNotas(data || [])
-    console.log('[NotasEditor] notas carregadas:', data)
-
-    // A nota ativa é a mais recente com status 'ativa'
-    const ativa = (data || []).find(n => n.status === 'ativa')
-    if (ativa) {
-      setNotaAtiva(ativa)
-      setTituloAtivo(ativa.titulo || '')
-      setAnexos(ativa.ind_nota_anexo || [])
-    } else {
-      setNotaAtiva(null)
-      setTituloAtivo('')
+    if (error) {
+      setErro(error.message)
+      return
     }
+
+    const lista = data || []
+    setNotas(lista)
+
+    // A nota atual é a mais recente ainda marcada como ativa
+    const ativa = lista.find(n => n.status === 'ativa') || null
+    setNotaAtiva(ativa)
+    setNotasAntigas(lista.filter(n => !ativa || n.id !== ativa.id))
+    setTituloAtivo(ativa?.titulo || '')
+    setAnexos(ativa?.ind_nota_anexo || [])
   }
 
   async function salvarNota() {
-    if (!notaAtiva) return
+    if (!notaAtiva || !editor) return
     setSaving(true)
+    setErro('')
     const html = editor.getHTML()
-    await supabase.from('ind_nota').update({
+    const { error } = await supabase.from('ind_nota').update({
       conteudo_html: html,
       titulo: tituloAtivo || notaAtiva.titulo,
       atualizado_em: new Date().toISOString(),
     }).eq('id', notaAtiva.id)
     setSaving(false)
+    if (error) {
+      setErro(error.message)
+      return
+    }
     await fetchNotas()
   }
 
-  async function criarNovaNota() {
-    // Arquiva a nota ativa atual
-    if (notaAtiva) {
-      await supabase.from('ind_nota').update({ status: 'arquivada' }).eq('id', notaAtiva.id)
+  async function arquivarAtivas() {
+    // Arquiva todas as notas ainda ativas do mesmo escopo
+    for (const n of notas.filter(x => x.status === 'ativa')) {
+      const { error } = await supabase.from('ind_nota')
+        .update({ status: 'arquivada', atualizado_em: new Date().toISOString() })
+        .eq('id', n.id)
+      if (error) return error.message
     }
-    const { data } = await supabase.from('ind_nota').insert({
+    return null
+  }
+
+  async function criarNovaNota() {
+    setErro('')
+    const erroArquivo = await arquivarAtivas()
+    if (erroArquivo) {
+      setErro(erroArquivo)
+      return
+    }
+
+    const { error } = await supabase.from('ind_nota').insert({
       referencia,
       id_grupo: idGrupo || null,
       id_subgrupo: idSubgrupo || null,
@@ -98,8 +130,14 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }
       ano_ref: anoRef || new Date().getFullYear(),
       status: 'ativa',
       autor_id: user.id_user,
-    }).select().single()
+    })
 
+    if (error) {
+      setErro(error.message)
+      return
+    }
+
+    setConfirmandoNova(false)
     setCriandoNova(false)
     setTitulo('')
     setMesRef('')
@@ -108,134 +146,89 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }
 
   async function uploadAnexo(file) {
     if (!file || !notaAtiva) return
+    setErro('')
     const isImage = file.type.startsWith('image/')
     const ext = file.name.split('.').pop()
     const path = `indicadores/notas/${notaAtiva.id}/${Date.now()}.${ext}`
     const { data, error } = await supabase.storage.from('task-attachments').upload(path, file, { upsert: true })
-    if (error) return
+    if (error) {
+      setErro(error.message)
+      return
+    }
     const { data: urlData } = supabase.storage.from('task-attachments').getPublicUrl(data.path)
-    await supabase.from('ind_nota_anexo').insert({
+    const { error: erroAnexo } = await supabase.from('ind_nota_anexo').insert({
       id_nota: notaAtiva.id, nome: file.name,
       url: urlData.publicUrl, tipo: isImage ? 'imagem' : 'arquivo',
     })
+    if (erroAnexo) {
+      setErro(erroAnexo.message)
+      return
+    }
     await fetchNotas()
   }
 
-  const notasArquivadas = notas.filter(n => n.status === 'arquivada')
+  function abrirNovaNota() {
+    setErro('')
+    if (notaAtiva) setConfirmandoNova(true)
+    else setCriandoNova(true)
+  }
 
   return (
     <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
       {/* Header */}
       <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-        <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text2)' }}>📝 Anotações</span>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {/* Histórico */}
-          {notasArquivadas.length > 0 && (
-            <button
-              onClick={() => setShowHistorico(true)}
-              style={{ ...btnSm, position: 'relative', paddingRight: 24 }}
-            >
-              📂 Histórico
-              <span style={{
-                position: 'absolute', top: -6, right: -6,
-                background: '#6366f1', color: '#fff', borderRadius: 99,
-                fontSize: 10, fontWeight: 700, minWidth: 18, height: 18,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px',
-              }}>{notasArquivadas.length}</span>
-            </button>
-          )}
-          {canEdit && !criandoNova && (
-            <button onClick={() => setCriandoNova(true)} style={btnSm}>
-              + Nova nota
-            </button>
-          )}
-        </div>
+        <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text2)' }}>Anotações</span>
+        {canEdit && !criandoNova && !confirmandoNova && (
+          <button onClick={abrirNovaNota} style={btnSm}>+ Nova nota</button>
+        )}
       </div>
 
-      {/* Modal criação nova nota */}
+      {erro && (
+        <div style={{ padding: '8px 16px', background: '#ef444422', color: '#ef4444', fontSize: 11, borderBottom: '1px solid var(--border)' }}>
+          {erro}
+        </div>
+      )}
+
+      {/* Confirmação de finalização da nota atual */}
+      {confirmandoNova && (
+        <div style={{ padding: '12px 16px', background: 'var(--bg3)', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 600, marginBottom: 4 }}>
+            Finalizar a nota atual?
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text5)', marginBottom: 10 }}>
+            {notaAtiva.titulo ? `"${notaAtiva.titulo}" ` : 'A nota atual '}
+            será arquivada e ficará disponível apenas para consulta no histórico. Depois disso você poderá criar a nova nota.
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => { setConfirmandoNova(false); setCriandoNova(true) }} style={{ ...btnSm, background: '#6366f1', color: '#fff', border: 'none' }}>
+              Finalizar e criar nova
+            </button>
+            <button onClick={() => setConfirmandoNova(false)} style={btnSm}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {/* Formulário de nova nota */}
       {criandoNova && (
-        <div style={{ padding: '12px 16px', background: 'var(--bg3)', borderBottom: '1px solid var(--border)', display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div>
-            <label style={labelSm}>Título</label>
-            <input value={titulo} onChange={e => setTitulo(e.target.value)} style={inputSm} placeholder="Título da nota" />
-          </div>
-          <div>
-            <label style={labelSm}>Mês ref.</label>
-            <select value={mesRef} onChange={e => setMesRef(e.target.value)} style={inputSm}>
-              <option value="">—</option>
-              {MESES_LABEL.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={labelSm}>Ano</label>
-            <input type="number" value={anoRef} onChange={e => setAnoRef(e.target.value)} style={{ ...inputSm, width: 70 }} />
-          </div>
-          <button onClick={criarNovaNota} style={{ ...btnSm, background: '#6366f1', color: '#fff', border: 'none' }}>Criar</button>
-          <button onClick={() => setCriandoNova(false)} style={btnSm}>Cancelar</button>
-        </div>
-      )}
-
-      {/* Modal histórico de notas */}
-      {showHistorico && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000,
-        }}>
-          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 24, width: '90%', maxWidth: 500, maxHeight: '80vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text2)' }}>📂 Notas arquivadas</span>
-              <button onClick={() => setShowHistorico(false)} style={{ background: 'none', border: 'none', color: 'var(--text4)', fontSize: 18, cursor: 'pointer' }}>✕</button>
+        <div style={{ padding: '12px 16px', background: 'var(--bg3)', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div>
+              <label style={labelSm}>Título</label>
+              <input value={titulo} onChange={e => setTitulo(e.target.value)} style={inputSm} placeholder="Título da nota" />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {notasArquivadas.map(n => (
-                <button
-                  key={n.id}
-                  onClick={() => { setVisualizando(n); setShowHistorico(false) }}
-                  style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '10px 14px', borderRadius: 10, border: '1px solid var(--border)',
-                    background: 'var(--bg3)', cursor: 'pointer', textAlign: 'left', gap: 8,
-                  }}
-                >
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text2)' }}>{n.titulo || 'Sem título'}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text5)', marginTop: 2 }}>
-                      {n.mes_ref ? MESES_LABEL[n.mes_ref - 1] + '/' : ''}{n.ano_ref}
-                      {' · '}{new Date(n.criado_em).toLocaleDateString('pt-BR')}
-                    </div>
-                  </div>
-                  <span style={{ fontSize: 11, color: '#6366f1', flexShrink: 0 }}>Ver →</span>
-                </button>
-              ))}
+            <div>
+              <label style={labelSm}>Mês ref.</label>
+              <select value={mesRef} onChange={e => setMesRef(e.target.value)} style={inputSm}>
+                <option value="">--</option>
+                {MESES_LABEL.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+              </select>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Visualizar nota arquivada */}
-      {visualizando && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000,
-        }}>
-          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 24, width: '90%', maxWidth: 640, maxHeight: '80vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div>
-                <div style={{ fontWeight: 700, color: 'var(--text2)', fontSize: 14 }}>{visualizando.titulo}</div>
-                <div style={{ fontSize: 11, color: 'var(--text5)' }}>
-                  {visualizando.mes_ref ? MESES_LABEL[visualizando.mes_ref - 1] + '/' : ''}{visualizando.ano_ref} — {new Date(visualizando.criado_em).toLocaleDateString('pt-BR')}
-                  {' '}<span style={{ background: '#47556933', borderRadius: 4, padding: '1px 6px' }}>arquivada</span>
-                </div>
-              </div>
-              <button onClick={() => { setVisualizando(null); setShowHistorico(true) }} style={{ background: 'none', border: 'none', color: 'var(--text4)', fontSize: 18, cursor: 'pointer' }}>✕</button>
+            <div>
+              <label style={labelSm}>Ano</label>
+              <input type="number" value={anoRef} onChange={e => setAnoRef(e.target.value)} style={{ ...inputSm, width: 70 }} />
             </div>
-            <div className="tiptap-view" dangerouslySetInnerHTML={{ __html: visualizando.conteudo_html || '<p style="color:var(--text5)">Nota vazia.</p>' }} />
-            {visualizando.ind_nota_anexo?.length > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <div style={{ fontSize: 11, color: 'var(--text5)', marginBottom: 6 }}>Anexos:</div>
-                <AnexosList anexos={visualizando.ind_nota_anexo} />
-              </div>
-            )}
+            <button onClick={criarNovaNota} style={{ ...btnSm, background: '#6366f1', color: '#fff', border: 'none' }}>Criar</button>
+            <button onClick={() => { setCriandoNova(false); setTitulo('') }} style={btnSm}>Cancelar</button>
           </div>
         </div>
       )}
@@ -252,10 +245,10 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }
                 style={{ ...inputSm, fontWeight: 600, fontSize: 13, flex: 1, minWidth: 120 }}
               />
             ) : (
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text3)' }}>
-                {notaAtiva.titulo}
-              </span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text3)' }}>{notaAtiva.titulo}</span>
             )}
+            <span style={{ fontSize: 10, color: '#6366f1', background: '#6366f122', borderRadius: 4, padding: '1px 6px' }}>atual</span>
+            <span style={{ fontSize: 10, color: 'var(--text5)' }}>criada por {nomeAutor(notaAtiva.autor_id)}</span>
             {notaAtiva.mes_ref && (
               <span style={{ fontSize: 11, color: 'var(--text5)' }}>
                 {MESES_LABEL[notaAtiva.mes_ref - 1]}/{notaAtiva.ano_ref}
@@ -267,16 +260,15 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }
             <EditorContent editor={editor} />
           </div>
 
-          {/* Anexos da nota */}
           <div style={{ padding: '8px 16px', borderTop: '1px solid var(--border)' }}>
             {anexos.length > 0 && <AnexosList anexos={anexos} />}
             {canEdit && (
               <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
-                <button onClick={() => fileRef.current?.click()} style={btnSm}>📎 Anexar</button>
+                <button onClick={() => fileRef.current?.click()} style={btnSm}>Anexar</button>
                 <input ref={fileRef} type="file" style={{ display: 'none' }}
                   onChange={e => uploadAnexo(e.target.files[0])} />
                 <button onClick={salvarNota} disabled={saving} style={{ ...btnSm, background: '#6366f1', color: '#fff', border: 'none' }}>
-                  {saving ? 'Salvando...' : '💾 Salvar nota'}
+                  {saving ? 'Salvando...' : 'Salvar nota'}
                 </button>
               </div>
             )}
@@ -287,6 +279,69 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit }
           {canEdit ? 'Nenhuma nota ativa. Crie uma nova nota acima.' : 'Nenhuma nota disponível.'}
         </div>
       )}
+
+      {/* Histórico de notas antigas (somente leitura) */}
+      {notasAntigas.length > 0 && (
+        <div style={{ borderTop: '1px solid var(--border)', padding: '12px 16px', background: 'var(--bg3)' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text4)', marginBottom: 8 }}>
+            Notas anteriores ({notasAntigas.length}) - somente leitura
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {notasAntigas.map(n => (
+              <button
+                key={n.id}
+                onClick={() => setVisualizando(n)}
+                style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
+                  background: 'var(--bg2)', cursor: 'pointer', textAlign: 'left', gap: 8,
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text3)' }}>{n.titulo || 'Sem título'}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text5)', marginTop: 2 }}>
+                    {n.mes_ref ? MESES_LABEL[n.mes_ref - 1] + '/' : ''}{n.ano_ref || ''}
+                    {' - '}{new Date(n.criado_em).toLocaleDateString('pt-BR')}
+                    {n.autor_id ? ` - por ${nomeAutor(n.autor_id)}` : ''}
+                    {n.status === 'arquivada' ? ' - arquivada' : ''}
+                  </div>
+                </div>
+                <span style={{ fontSize: 11, color: '#6366f1', flexShrink: 0 }}>Ver</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Visualizar nota antiga */}
+      {visualizando && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000,
+        }}>
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 24, width: '90%', maxWidth: 640, maxHeight: '80vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div>
+                <div style={{ fontWeight: 700, color: 'var(--text2)', fontSize: 14 }}>{visualizando.titulo || 'Sem título'}</div>
+                <div style={{ fontSize: 11, color: 'var(--text5)' }}>
+                  {visualizando.mes_ref ? MESES_LABEL[visualizando.mes_ref - 1] + '/' : ''}{visualizando.ano_ref || ''}
+                  {' - '}{new Date(visualizando.criado_em).toLocaleDateString('pt-BR')}
+                  {' '}<span style={{ background: '#47556933', borderRadius: 4, padding: '1px 6px' }}>somente leitura</span>
+                  {visualizando.autor_id ? ` - criada por ${nomeAutor(visualizando.autor_id)}` : ''}
+                </div>
+              </div>
+              <button onClick={() => setVisualizando(null)} style={{ background: 'none', border: 'none', color: 'var(--text4)', fontSize: 18, cursor: 'pointer' }}>x</button>
+            </div>
+            <div className="tiptap-view" dangerouslySetInnerHTML={{ __html: visualizando.conteudo_html || '<p style="color:var(--text5)">Nota vazia.</p>' }} />
+            {visualizando.ind_nota_anexo?.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 11, color: 'var(--text5)', marginBottom: 6 }}>Anexos:</div>
+                <AnexosList anexos={visualizando.ind_nota_anexo} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -295,6 +350,7 @@ function Toolbar({ editor }) {
   if (!editor) return null
   const btn = (action, label, active) => (
     <button
+      key={label}
       onMouseDown={e => { e.preventDefault(); action() }}
       style={{
         padding: '3px 8px', borderRadius: 4, border: 'none', fontSize: 12,
@@ -312,12 +368,12 @@ function Toolbar({ editor }) {
       {btn(() => editor.chain().focus().toggleStrike().run(), 'S', editor.isActive('strike'))}
       <span style={{ width: 1, background: 'var(--border)', margin: '2px 4px' }} />
       {btn(() => editor.chain().focus().toggleHeading({ level: 2 }).run(), 'H2', editor.isActive('heading', { level: 2 }))}
-      {btn(() => editor.chain().focus().toggleBulletList().run(), '• Lista', editor.isActive('bulletList'))}
+      {btn(() => editor.chain().focus().toggleBulletList().run(), 'Lista', editor.isActive('bulletList'))}
       {btn(() => editor.chain().focus().toggleOrderedList().run(), '1. Lista', editor.isActive('orderedList'))}
       <span style={{ width: 1, background: 'var(--border)', margin: '2px 4px' }} />
-      {btn(() => editor.chain().focus().setTextAlign('left').run(), '⬅', editor.isActive({ textAlign: 'left' }))}
-      {btn(() => editor.chain().focus().setTextAlign('center').run(), '↔', editor.isActive({ textAlign: 'center' }))}
-      {btn(() => editor.chain().focus().setTextAlign('right').run(), '➡', editor.isActive({ textAlign: 'right' }))}
+      {btn(() => editor.chain().focus().setTextAlign('left').run(), 'Esq.', editor.isActive({ textAlign: 'left' }))}
+      {btn(() => editor.chain().focus().setTextAlign('center').run(), 'Centro', editor.isActive({ textAlign: 'center' }))}
+      {btn(() => editor.chain().focus().setTextAlign('right').run(), 'Dir.', editor.isActive({ textAlign: 'right' }))}
     </div>
   )
 }
@@ -331,7 +387,7 @@ function AnexosList({ anexos }) {
             <img src={a.url} alt={a.nome} style={{ height: 64, borderRadius: 6, border: '1px solid var(--border)', objectFit: 'cover' }} />
           ) : (
             <div style={{ padding: '6px 12px', background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11, color: 'var(--text3)' }}>
-              📄 {a.nome}
+              {a.nome}
             </div>
           )}
         </a>

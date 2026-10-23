@@ -2,16 +2,28 @@ import { useState } from 'react'
 import { supabase } from '../../supabase'
 import { useAuth } from '../../context/AuthContext'
 import CelulaInput from './CelulaInput'
+import { parseNumeroBR } from '../../utils/numeros'
 
 const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
 
-export default function TabelaSubgrupo({ subgrupo, valores, ano, onUpdate, users, canEdit }) {
+export default function TabelaSubgrupo({ subgrupo, valores, ano, onUpdate, users, comentarios, canEdit }) {
   const { user } = useAuth()
   const indicadores = subgrupo.ind_indicador || []
 
   // Estado local: { [indId_mes]: string }
   const [localEdits, setLocalEdits] = useState({})
   const [saving, setSaving] = useState(false)
+  const [hoverComentarios, setHoverComentarios] = useState(() => {
+    try { return localStorage.getItem('ind_hover_comentarios') !== '0' } catch { return true }
+  })
+
+  function toggleHoverComentarios() {
+    setHoverComentarios(prev => {
+      const novo = !prev
+      try { localStorage.setItem('ind_hover_comentarios', novo ? '1' : '0') } catch { /* ignore */ }
+      return novo
+    })
+  }
 
   const hasDirty = Object.keys(localEdits).length > 0
 
@@ -27,28 +39,52 @@ export default function TabelaSubgrupo({ subgrupo, valores, ano, onUpdate, users
   async function handleSave() {
     if (!hasDirty) return
     setSaving(true)
+    const erros = []
     try {
       const promises = Object.entries(localEdits).map(async ([key, rawVal]) => {
         const [indId, mes] = key.split('_').map(Number)
-        const num = parseFloat(String(rawVal).replace(',', '.'))
-        if (isNaN(num)) return
-
         const existingRow = valores[indId]?.[mes]
+        const texto = String(rawVal ?? '').trim()
+
+        // Célula apagada: remove o valor salvo (e comentários, via cascade)
+        if (texto === '') {
+          if (existingRow?.id) {
+            const { error } = await supabase.from('ind_valor').delete().eq('id', existingRow.id)
+            if (error) erros.push(error.message)
+          }
+          return
+        }
+
+        const num = parseNumeroBR(texto)
+        if (isNaN(num)) {
+          erros.push(`Valor inválido em ${indicadores.find(i => i.id === indId)?.nome || 'indicador'} (${mes}): "${texto}"`)
+          return
+        }
+
         if (existingRow?.id) {
-          await supabase.from('ind_valor').update({
+          const { error } = await supabase.from('ind_valor').update({
             valor: num,
             atualizado_em: new Date().toISOString(),
             atualizado_por: user.id_user,
           }).eq('id', existingRow.id)
+          if (error) erros.push(error.message)
         } else {
-          await supabase.from('ind_valor').insert({
+          const { error } = await supabase.from('ind_valor').insert({
             id_indicador: indId, ano, mes,
             valor: num, atualizado_por: user.id_user,
           })
+          if (error) erros.push(error.message)
         }
       })
 
       await Promise.all(promises)
+
+      if (erros.length > 0) {
+        alert('Algumas células não foram salvas:\n\n' + erros.join('\n'))
+        onUpdate()
+        return
+      }
+
       setLocalEdits({})
       onUpdate()
     } finally {
@@ -62,25 +98,48 @@ export default function TabelaSubgrupo({ subgrupo, valores, ano, onUpdate, users
 
   return (
     <div style={{ marginBottom: 16 }}>
-      {/* Barra de ações — só aparece quando há edições pendentes */}
-      {canEdit && (
-        <div style={{
-          display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8,
-          marginBottom: 8, minHeight: 32,
-        }}>
-          {hasDirty && (
-            <>
-              <span style={{ fontSize: 11, color: '#f59e0b' }}>
-                ● {Object.keys(localEdits).length} alteração(ões) não salva(s)
-              </span>
-              <button onClick={handleDiscard} style={btnDiscard}>Descartar</button>
-              <button onClick={handleSave} disabled={saving} style={btnSave}>
-                {saving ? 'Salvando...' : '💾 Salvar'}
-              </button>
-            </>
-          )}
-        </div>
-      )}
+      {/* Barra de ações e preferência de comentários */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
+        marginBottom: 8, minHeight: 32, flexWrap: 'wrap',
+      }}>
+        <button
+          onClick={toggleHoverComentarios}
+          title="Ao ativar, o comentário aparece ao passar o mouse sobre o valor"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'var(--bg3)', border: '1px solid var(--border)',
+            borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
+            color: hoverComentarios ? 'var(--text2)' : 'var(--text5)',
+            fontSize: 11, fontWeight: 600, fontFamily: 'Inter, sans-serif',
+          }}
+        >
+          <span style={{
+            width: 30, height: 16, borderRadius: 99, position: 'relative',
+            background: hoverComentarios ? '#6366f1' : 'var(--border)',
+            transition: 'background 0.15s', flexShrink: 0,
+          }}>
+            <span style={{
+              position: 'absolute', top: 2, left: hoverComentarios ? 16 : 2,
+              width: 12, height: 12, borderRadius: '50%', background: '#fff',
+              transition: 'left 0.15s',
+            }} />
+          </span>
+          Comentários ao passar o mouse
+        </button>
+
+        {canEdit && hasDirty && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 11, color: '#f59e0b' }}>
+              ● {Object.keys(localEdits).length} alteração(ões) não salva(s)
+            </span>
+            <button onClick={handleDiscard} style={btnDiscard}>Descartar</button>
+            <button onClick={handleSave} disabled={saving} style={btnSave}>
+              {saving ? 'Salvando...' : '💾 Salvar'}
+            </button>
+          </div>
+        )}
+      </div>
 
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
@@ -132,6 +191,8 @@ export default function TabelaSubgrupo({ subgrupo, valores, ano, onUpdate, users
                       mes={mes}
                       users={users}
                       canEdit={canEdit}
+                      comentariosIniciais={indValores[mes]?.id ? comentarios?.[indValores[mes].id] : undefined}
+                      hoverComentarios={hoverComentarios}
                     />
                   ))}
                 </tr>

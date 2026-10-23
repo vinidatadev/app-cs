@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import GrupoAdmin from '../components/indicadores/GrupoAdmin'
+import RelatorioBiModal from '../components/indicadores/RelatorioBiModal'
 import { useIndicadores } from '../hooks/useIndicadores'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../supabase'
@@ -11,6 +12,7 @@ export default function Indicadores() {
   const navigate = useNavigate()
   const { grupos, loading, refresh } = useIndicadores()
   const [modalGrupo, setModalGrupo] = useState(null) // null | 'novo' | grupo obj
+  const [showBi, setShowBi] = useState(false)
   const [users, setUsers] = useState([])
   const [usersLoaded, setUsersLoaded] = useState(false)
 
@@ -43,9 +45,12 @@ export default function Indicadores() {
               Selecione um grupo para visualizar e editar os indicadores.
             </p>
           </div>
-          {isAdmin && (
-            <button onClick={() => abrirModal()} style={btnPrimary}>+ Novo grupo</button>
-          )}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button onClick={() => setShowBi(true)} style={btnBi}>Abrir BI</button>
+            {isAdmin && (
+              <button onClick={() => abrirModal()} style={btnPrimary}>+ Novo grupo</button>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -97,6 +102,8 @@ export default function Indicadores() {
           onSave={refresh}
         />
       )}
+
+      {showBi && <RelatorioBiModal onClose={() => setShowBi(false)} />}
     </div>
   )
 }
@@ -104,6 +111,10 @@ export default function Indicadores() {
 const btnPrimary = {
   background: '#6366f1', border: 'none', color: '#fff', borderRadius: 10,
   padding: '9px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+}
+const btnBi = {
+  background: 'var(--bg2)', border: '1px solid #6366f155', color: '#6366f1', borderRadius: 10,
+  padding: '9px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
 }
 const btnIcon = {
   background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 8,
