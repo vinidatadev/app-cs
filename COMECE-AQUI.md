@@ -40,5 +40,5 @@ frontend/                React + proxy Nginx
 ## Avisos
 
 - O `.env` é obrigatório e contém as senhas. Não suba para o Git.
-- Troque `POSTGRES_PASSWORD`, `MINIO_ROOT_PASSWORD`, `SECRET_KEY` e `ADMIN_PASSWORD` antes do deploy.
+- Troque `POSTGRES_PASSWORD`, `MINIO_SECRET_KEY`, `SECRET_KEY` e `ADMIN_PASSWORD` antes do deploy.
 - `docker compose down -v` apaga o banco e os arquivos do MinIO.

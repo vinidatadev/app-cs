@@ -92,7 +92,7 @@ Se funcionar no backend e falhar na 3000, o Nginx pode estar interceptando a rot
 docker compose logs --tail=100 minio backend
 ```
 
-- Confira `MINIO_ROOT_USER` e `MINIO_ROOT_PASSWORD` no `.env` (senha com no mínimo 8 caracteres).
+- Confira `MINIO_ACCESS_KEY` e `MINIO_SECRET_KEY` no `.env` (senha com no mínimo 8 caracteres).
 - O backend usa exatamente essas credenciais para criar os buckets e fazer upload.
 - Se a imagem `minio/minio:latest` não estiver disponível no servidor, importe-a de outra máquina ou use um mirror interno.
 - Se o volume do MinIO foi criado com outra senha, o MinIO pode recusar o login. Em ambiente de teste, recrie com `docker compose down -v`. Em produção, mantenha as credenciais originais.

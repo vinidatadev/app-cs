@@ -23,7 +23,7 @@ docker exec organograma-minio sh -lc "mc alias set local http://localhost:9000 m
 docker cp organograma-minio:/tmp/backup .\minio-backup
 ```
 
-Ajuste usuário/senha se você trocou `MINIO_ROOT_USER`/`MINIO_ROOT_PASSWORD`.
+Ajuste usuário/senha se você trocou `MINIO_ACCESS_KEY`/`MINIO_SECRET_KEY`.
 
 Alternativa: backup bruto do volume (pare o MinIO antes):
 

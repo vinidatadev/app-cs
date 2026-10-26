@@ -14,8 +14,8 @@
 
 ```env
 POSTGRES_PASSWORD=senha_forte
-MINIO_ROOT_USER=organograma
-MINIO_ROOT_PASSWORD=senha_forte_minimo_8_caracteres
+MINIO_ACCESS_KEY=organograma
+MINIO_SECRET_KEY=senha_forte_minimo_8_caracteres
 SECRET_KEY=chave_jwt_com_32_caracteres_ou_mais
 CORS_ORIGINS=http://IP_DO_SERVIDOR:3000
 ADMIN_EMAIL=admin@empresa.com
