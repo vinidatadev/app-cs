@@ -1,67 +1,43 @@
-# 📋 Organograma - Guia de Deploy Completo
+# 00 - Leia-me primeiro
 
-## 📁 Estrutura do Projeto
+## Stack
 
-```
-organograma/
-├── frontend/          # Aplicação React (Vue substituído por React)
-├── backend/           # API Python/FastAPI
-├── database/          # Scripts SQL do Postgres
-├── docs/              # Documentação completa
-└── docker-compose.yml # Orquestração de todos os serviços
-```
+- Frontend React + Nginx
+- Backend FastAPI (auth e uploads)
+- PostgREST (CRUD REST)
+- PostgreSQL 15
+- MinIO (storage S3 local)
 
-## 🎯 O que mudou?
+## Subir
 
-**ANTES (Vercel + Supabase):**
-- Frontend hospedado na Vercel
-- Banco de dados no Supabase (externo)
-- Bloqueado por CORS e firewall corporativo
-
-**AGORA (Servidor Local):**
-- Frontend: React servido via Nginx
-- Backend: API Python/FastAPI
-- Banco: Postgres local
-- Autenticação: Microsoft Azure AD (OAuth)
-- Tudo rodando em containers Docker
-
-## 📚 Ordem de Leitura da Documentação
-
-1. **00-LEIA-ME-PRIMEIRO.md** (este arquivo)
-2. **01-REQUISITOS.md** - O que você precisa ter instalado
-3. **02-CONFIGURACAO-AZURE.md** - Como configurar login Microsoft (apenas leitura)
-4. **03-ESTRUTURA-PROJETO.md** - Explicação detalhada de cada pasta
-5. **04-BACKEND-API.md** - Endpoints da API Python
-6. **05-BANCO-DE-DADOS.md** - Estrutura das tabelas
-7. **06-DEPLOY-PORTAINER.md** - Como fazer deploy final
-8. **07-TROUBLESHOOTING.md** - Resolução de problemas
-
-## ⚡ Quick Start (para testar localmente)
-
-```bash
-# 1. Clonar/acessar o projeto
-cd organograma
-
-# 2. Subir todos os serviços
-docker-compose up -d
-
-# 3. Acessar
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# Postgres: localhost:5432
+```powershell
+docker compose up -d --build
 ```
 
-## 🚀 Para Deploy no Portainer
+## URLs
 
-Veja o arquivo **docs/06-DEPLOY-PORTAINER.md** com o passo a passo completo.
+| Recurso | URL |
+|---|---|
+| Aplicação | http://localhost:3000 |
+| Backend / Swagger | http://localhost:8000/docs |
+| Health | http://localhost:8000/health |
+| PostgREST | http://localhost:3001 |
+| Postgres | localhost:5432 |
+| MinIO Console | http://localhost:9101 |
 
-## ⚠️ Importante
+## Login inicial
 
-- **Não delete** os arquivos `.env` - eles contêm configurações essenciais
-- **Configure** as credenciais do Azure antes do deploy
-- **Teste localmente** antes de subir no servidor da empresa
-- **Backup** do banco é automático (volume Docker persistente)
+- Admin: `admin@empresa.com` / `admin123`
+- Usuários migrados: nome cadastrado / `organograma123`
 
-## 🆘 Precisa de ajuda?
+## Documentos
 
-Veja o arquivo **docs/07-TROUBLESHOOTING.md**
+1. [01-REQUISITOS.md](01-REQUISITOS.md)
+2. [02-ARQUITETURA.md](02-ARQUITETURA.md)
+3. [03-BANCO-DE-DADOS.md](03-BANCO-DE-DADOS.md)
+4. [04-API-LOCAL.md](04-API-LOCAL.md)
+5. [05-LOGIN-E-USUARIOS.md](05-LOGIN-E-USUARIOS.md)
+6. [06-DEPLOY-PORTAINER.md](06-DEPLOY-PORTAINER.md)
+7. [07-TROUBLESHOOTING.md](07-TROUBLESHOOTING.md)
+8. [08-MIGRACAO-SUPABASE.md](08-MIGRACAO-SUPABASE.md)
+9. [09-BACKUP-RESTORE.md](09-BACKUP-RESTORE.md)

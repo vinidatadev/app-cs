@@ -1,86 +1,84 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+
 from app.core.config import settings
-from app.core.security import create_access_token
-import httpx
+from app.core.database import get_cursor
+from app.core.security import create_access_token, require_user
 
-router = APIRouter()
+router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-@router.get("/login")
-async def login():
-    """Retorna URL para login Microsoft"""
-    if not settings.AZURE_CLIENT_ID:
-        raise HTTPException(status_code=501, detail="Azure AD não configurado")
-    
-    auth_url = (
-        f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/oauth2/v2.0/authorize"
-        f"?client_id={settings.AZURE_CLIENT_ID}"
-        f"&response_type=code"
-        f"&redirect_uri={settings.AZURE_REDIRECT_URI}"
-        f"&scope=openid email profile"
-    )
-    
-    return {"auth_url": auth_url}
 
-@router.get("/callback")
-async def callback(code: str):
-    """Callback do Azure AD"""
-    if not settings.AZURE_CLIENT_ID:
-        raise HTTPException(status_code=501, detail="Azure AD não configurado")
-    
-    # Trocar code por token
-    token_url = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/oauth2/v2.0/token"
-    
-    data = {
-        "client_id": settings.AZURE_CLIENT_ID,
-        "client_secret": settings.AZURE_CLIENT_SECRET,
-        "code": code,
-        "redirect_uri": settings.AZURE_REDIRECT_URI,
-        "grant_type": "authorization_code"
+class LoginBody(BaseModel):
+    login: str | None = None
+    email: str | None = None
+    password: str
+
+
+def public_user(row: dict) -> dict:
+    return {
+        "id": row["id_user"],
+        "email": row.get("email"),
+        "username": row.get("username"),
+        "name": row.get("display_name") or row.get("nome_usuario"),
+        "nome_usuario": row.get("nome_usuario"),
+        "cargo": row.get("cargo"),
+        "nivel": row.get("nivel"),
+        "setor": row.get("setor"),
+        "foto": row.get("foto"),
     }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.post(token_url, data=data)
-        
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Erro no login Microsoft")
-        
-        token_data = response.json()
-        access_token = token_data.get("access_token")
-        
-        # Buscar dados do usuário
-        graph_response = await client.get(
-            "https://graph.microsoft.com/v1.0/me",
-            headers={"Authorization": f"Bearer {access_token}"}
-        )
-        
-        if graph_response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Erro ao buscar dados do usuário")
-        
-        user_data = graph_response.json()
-        
-        # Criar JWT
-        jwt_token = create_access_token({
-            "sub": user_data.get("id"),
-            "email": user_data.get("mail") or user_data.get("userPrincipalName"),
-            "nome": user_data.get("displayName")
-        })
-        
-        return {
-            "access_token": jwt_token,
-            "token_type": "bearer",
-            "user": {
-                "email": user_data.get("mail") or user_data.get("userPrincipalName"),
-                "nome": user_data.get("displayName")
-            }
-        }
 
-@router.post("/login/basic")
-async def login_basic(email: str, password: str):
-    """Login básico (fallback sem Azure)"""
-    # TODO: Implementar validação no banco
-    # Por enquanto, login de teste
-    if email == "admin@empresa.com" and password == "admin123":
-        token = create_access_token({"sub": "1", "email": email})
-        return {"access_token": token, "token_type": "bearer"}
-    
-    raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+@router.post("/login")
+def login(body: LoginBody):
+    identifier = (body.login or body.email or "").strip()
+    if not identifier or not body.password:
+        raise HTTPException(status_code=400, detail="Informe usuário/e-mail e senha")
+
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            SELECT a.id_user::text AS id_user, a.username, a.email, a.display_name,
+                   u.nome_usuario, u.cargo, u.nivel, u.setor, u.foto
+            FROM public.app_auth a
+            JOIN public."user" u ON u.id_user = a.id_user
+            WHERE a.is_active
+              AND (
+                lower(a.email) = lower(trim(%s))
+                OR lower(a.username) = lower(trim(%s))
+                OR regexp_replace(lower(a.display_name), '^\s+|\s+$', '', 'g') = lower(%s)
+              )
+              AND a.password_hash = crypt(%s, a.password_hash)
+            ORDER BY CASE WHEN lower(a.email) = lower(%s) THEN 0 ELSE 1 END, a.id
+            LIMIT 1
+            """,
+            (identifier, identifier, identifier, body.password, identifier),
+        )
+        row = cur.fetchone()
+
+    if not row:
+        raise HTTPException(status_code=401, detail="Credenciais inválidas")
+
+    token = create_access_token(row["id_user"], row.get("email"))
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        "user": public_user(dict(row)),
+    }
+
+
+@router.get("/me")
+def me(user: dict = Depends(require_user)):
+    return {
+        "user": {
+            "id": user["id"],
+            "email": user.get("email"),
+            "username": user.get("username"),
+            "name": user.get("display_name") or user.get("nome_usuario"),
+        }
+    }
+
+
+@router.post("/logout")
+def logout():
+    return {"ok": True}

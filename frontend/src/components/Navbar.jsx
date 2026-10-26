@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import PerfilModal from './PerfilModal'
 
-const FLOWCHECK_URL = import.meta.env.VITE_FLOWCHECK_URL || 'http://localhost:5174'
+const FLOWCHECK_URL = import.meta.env.VITE_FLOWCHECK_URL || 'https://flowcheck-three.vercel.app/home'
 
 export default function Navbar() {
   const { user, perm, isAdmin, logout } = useAuth()

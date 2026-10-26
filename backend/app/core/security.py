@@ -1,41 +1,60 @@
-from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+from datetime import datetime, timedelta, timezone
+
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
+
 from app.core.config import settings
+from app.core.database import get_cursor
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-security = HTTPBearer()
+bearer = HTTPBearer(auto_error=False)
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def create_access_token(subject: str, email: str | None = None) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": subject, "role": "organograma_api", "exp": expire}
+    if email:
+        payload["email"] = email
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
-def create_access_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    return encoded_jwt
 
-def decode_access_token(token: str):
+def decode_access_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        return payload
-    except JWTError:
+        return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    except JWTError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido",
+            detail="Token inválido ou expirado",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+
+
+def require_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> dict:
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Autenticação obrigatória",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    token = credentials.credentials
-    payload = decode_access_token(token)
-    user_id = payload.get("sub")
-    if user_id is None:
-        raise HTTPException(status_code=401, detail="Token inválido")
-    return {"id": user_id, "email": payload.get("email")}
+    payload = decode_access_token(credentials.credentials)
+    subject = payload.get("sub")
+    if not subject:
+        raise HTTPException(status_code=401, detail="Token sem usuário")
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            SELECT a.id_user::text AS id, a.email, a.username, a.display_name,
+                   u.nome_usuario, u.cargo, u.nivel, u.setor, u.foto
+            FROM public.app_auth a
+            JOIN public."user" u ON u.id_user = a.id_user
+            WHERE a.id_user = %s::uuid AND a.is_active
+            LIMIT 1
+            """,
+            (subject,),
+        )
+        user = cur.fetchone()
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuário inativo ou removido")
+    return dict(user)

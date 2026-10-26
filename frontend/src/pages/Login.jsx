@@ -41,18 +41,18 @@ export default function Login() {
             Painel CS
           </h1>
           <p style={{ fontSize: 13, color: 'var(--text4)', marginTop: 6 }}>
-            Entre com sua conta corporativa
+             Entre com seu e-mail ou nome de usuário
           </p>
         </div>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label style={labelStyle}>E-mail</label>
+            <label style={labelStyle}>E-mail ou usuário</label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="seu@email.com"
+              placeholder="admin@empresa.com ou seu nome"
               required
               disabled={loading}
               className="t-input"

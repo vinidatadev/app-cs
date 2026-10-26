@@ -1,65 +1,30 @@
-# 📦 Requisitos
+# 01 - Requisitos
 
-## Para Desenvolvimento Local
+## Obrigatórios
 
-### Obrigatório
-- **Docker Desktop** (Windows/Mac) ou Docker Engine (Linux)
-  - Download: https://www.docker.com/products/docker-desktop/
-  - Versão mínima: 20.10+
-- **Git** (para versionamento)
+- Docker Desktop/Engine
+- Docker Compose v2 (`docker compose`)
+- Portas livres: 3000, 5432, 8000, 3001, 9100 e 9101
+- Cerca de 1,5 GB de RAM disponível para a stack
 
-### Opcional (apenas se não usar Docker)
+## Opcionais (desenvolvimento sem Docker)
+
 - Node.js 18+
 - Python 3.11+
-- PostgreSQL 15+
+- npm 9+
 
-## Para Deploy no Portainer
+## Verificar
 
-### Servidor da Empresa
-- **Portainer** instalado e rodando
-- **Docker** no servidor
-- **Acesso** ao servidor (SSH ou console do Portainer)
-- **Portas liberadas**:
-  - 3000 (Frontend)
-  - 8000 (Backend API)
-  - 5432 (Postgres - apenas interno)
-
-### Rede
-- Acesso à internet para baixar imagens Docker (inicial)
-- Após download, funciona offline
-- **Não precisa** de acesso ao Supabase externo
-
-## Credenciais Azure AD (para autenticação Microsoft)
-
-Você vai precisar do **App Registration** no Azure:
-- **Client ID** (Application ID)
-- **Client Secret**
-- **Tenant ID**
-- **Redirect URI** configurada
-
-Veja o arquivo **02-CONFIGURACAO-AZURE.md** para detalhes.
-
-## Verificação Rápida
-
-### Verificar se Docker está instalado:
-```bash
+```powershell
 docker --version
-docker-compose --version
+docker compose version
 ```
 
-### Verificar se Portainer está acessível:
-- Abra: `http://ip-do-servidor:9000` (ou porta configurada)
-- Deve aparecer o login do Portainer
+## Teste rápido de portas
 
-## Recursos de Hardware Recomendados
-
-### Servidor de Produção
-- **CPU**: 2+ cores
-- **RAM**: 4GB mínimo (8GB recomendado)
-- **Disco**: 20GB livres
-- **SO**: Linux (Ubuntu/Debian) ou Windows Server
-
-### Desenvolvimento Local
-- **CPU**: 2+ cores
-- **RAM**: 8GB mínimo
-- **Disco**: 10GB livres
+```powershell
+Test-NetConnection localhost -Port 3000
+Test-NetConnection localhost -Port 8000
+Test-NetConnection localhost -Port 5432
+Test-NetConnection localhost -Port 9100
+```

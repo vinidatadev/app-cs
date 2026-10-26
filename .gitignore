@@ -5,3 +5,6 @@ dist
 .env.*.local
 *.log
 .DS_Store
+
+backend/seed-assets/*
+!backend/seed-assets/README.md

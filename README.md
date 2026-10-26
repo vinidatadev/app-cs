@@ -1,103 +1,132 @@
-# 🏢 Sistema de Organograma Corporativo
+# Organograma Corporativo
 
-Sistema completo de gestão de organograma com frontend React, backend Python/FastAPI e banco PostgreSQL.
+Aplicação de organograma, células, capacitação, transações e indicadores rodando 100% em Docker local, sem dependência do Supabase.
 
-## 📋 Início Rápido
+## Arquitetura
 
-### 1. Clone o projeto
-```bash
-git clone <seu-repositorio>
-cd organograma
+```text
+Navegador
+   │
+   ▼
+Frontend React + Nginx (:3000)
+   ├── /            → SPA React
+   ├── /api/*       → Backend FastAPI (:8000)  → auth JWT + uploads
+   │                          │
+   │                          ▼
+   │                     MinIO (:9000)  → fotos e anexos
+   └── /rest/v1/*   → PostgREST (:3000)        → CRUD no PostgreSQL
+                                      │
+                                      ▼
+                               PostgreSQL 15 (:5432)
 ```
 
-### 2. Configure as variáveis de ambiente
-```bash
-cp .env.example .env
-# Edite o .env com suas configurações
+| Serviço | Container | Porta no host | Função |
+|---|---|---|---|
+| frontend | `organograma-frontend` | 3000 | React servido pelo Nginx e proxy da API |
+| backend | `organograma-backend` | 8000 | Login, JWT, upload/download de arquivos |
+| minio | `organograma-minio` | 9100 / 9101 | Storage S3 local (arquivos e fotos) |
+| postgrest | `organograma-postgrest` | 3001 | API REST sobre o PostgreSQL |
+| postgres | `organograma-postgres` | 5432 | Banco de dados e volume persistente |
+
+## Início rápido
+
+```powershell
+cd app-cs
+docker compose up -d --build
 ```
 
-### 3. Suba os containers
-```bash
-docker-compose up -d
+Aguarde alguns segundos e acesse:
+
+- Aplicação: http://localhost:3000
+- API/Swagger: http://localhost:8000/docs
+- Health check: http://localhost:8000/health
+- PostgREST: http://localhost:3001
+- MinIO Console: http://localhost:9101 (minioadmin / minioadmin123 por padrão)
+
+## Login
+
+Conta administrativa criada no startup:
+
+```text
+E-mail: admin@empresa.com
+Senha:  admin123
 ```
 
-### 4. Acesse
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000/docs
-- **Postgres**: localhost:5432
+As 26 pessoas migradas do Supabase também receberam conta local:
 
-## 📚 Documentação Completa
-
-Toda a documentação está na pasta `docs/`:
-
-1. **[00-LEIA-ME-PRIMEIRO.md](docs/00-LEIA-ME-PRIMEIRO.md)** - Visão geral
-2. **[01-REQUISITOS.md](docs/01-REQUISITOS.md)** - Pré-requisitos
-3. **[02-CONFIGURACAO-AZURE.md](docs/02-CONFIGURACAO-AZURE.md)** - Login Microsoft
-4. **[03-ESTRUTURA-PROJETO.md](docs/03-ESTRUTURA-PROJETO.md)** - Arquitetura
-5. **[04-BACKEND-API.md](docs/04-BACKEND-API.md)** - API REST
-6. **[05-BANCO-DE-DADOS.md](docs/05-BANCO-DE-DADOS.md)** - Estrutura DB
-7. **[06-DEPLOY-PORTAINER.md](docs/06-DEPLOY-PORTAINER.md)** - Deploy produção
-8. **[07-TROUBLESHOOTING.md](docs/07-TROUBLESHOOTING.md)** - Resolução de problemas
-
-## 🏗️ Estrutura do Projeto
-
-```
-organograma/
-├── frontend/          # React + Vite + Nginx
-├── backend/           # FastAPI + Python
-├── database/          # Scripts SQL
-└── docs/              # Documentação
+```text
+Login:  nome cadastrado (ex.: "Vinicius Nascimento") ou e-mail @organograma.local
+Senha:  organograma123
 ```
 
-## 🚀 Deploy no Portainer
+> Troque `ADMIN_PASSWORD` no `.env` e as senhas padrão antes de usar em produção. Veja [docs/05-LOGIN-E-USUARIOS.md](docs/05-LOGIN-E-USUARIOS.md).
 
-Veja o guia completo em **[docs/06-DEPLOY-PORTAINER.md](docs/06-DEPLOY-PORTAINER.md)**
+## O que foi migrado
 
-## 🔐 Login
+- Estrutura completa do banco usada pelo frontend (usuários, organograma, células, cursos, transações e módulo de indicadores).
+- 26 usuários, 23 vínculos do organograma, 3 células, 7 membros de células e 2 relações entre células.
+- Fotos de perfil que estavam no Storage do Supabase foram migradas para o MinIO.
+- Autenticação, Storage e REST agora rodam localmente com PostgreSQL + MinIO.
 
-### Com Microsoft (Azure AD)
-Configure as credenciais no `.env` e use o botão "Login com Microsoft"
+Detalhes e limitações: [docs/08-MIGRACAO-SUPABASE.md](docs/08-MIGRACAO-SUPABASE.md).
 
-### Login básico (fallback)
-- Usuário: `admin@empresa.com`
-- Senha: `admin123`
+## Comandos úteis
 
-## 🛠️ Desenvolvimento
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-# Acesse: http://localhost:5173
+```powershell
+docker compose ps
+docker compose logs -f backend
+docker compose logs -f postgrest
+docker compose restart backend
+docker compose down
+docker compose down -v   # apaga banco e arquivos do MinIO (destrutivo)
 ```
 
-### Backend
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-# Acesse: http://localhost:8000/docs
+Smoke test após subir a stack:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-test.ps1
 ```
 
-## 📦 Tecnologias
+Acessar o banco:
 
-- **Frontend**: React, Vite, React Flow (organograma visual)
-- **Backend**: FastAPI, SQLAlchemy, Python 3.11
-- **Banco**: PostgreSQL 15
-- **Auth**: Microsoft Azure AD (OAuth 2.0)
-- **Deploy**: Docker, Docker Compose, Portainer
+```powershell
+docker exec -it organograma-postgres psql -U postgres -d organograma
+```
 
-## 🆘 Suporte
+## Estrutura
 
-- Problemas? Veja **[docs/07-TROUBLESHOOTING.md](docs/07-TROUBLESHOOTING.md)**
-- Dúvidas sobre API? Acesse `/docs` no backend
-- Bugs? Abra uma issue no repositório
+```text
+app-cs/
+├── frontend/              React + Vite + Nginx
+│   ├── src/supabase.js    client local compatível com as chamadas existentes
+│   └── nginx.conf         proxy /api e /rest/v1
+├── backend/               FastAPI (auth + storage)
+│   ├── app/
+│   └── seed-assets/       fotos locais (não versionadas) para seed do MinIO
+├── database/
+│   ├── init/              schema, seed e grants executados pelo Postgres
+│   └── legacy/            scripts Supabase antigos, mantidos para consulta
+├── docs/                  documentação atual
+└── _archive/              artefatos e documentação antigos
+```
 
-## 📝 Licença
+## Documentação
 
-Propriedade da empresa. Uso interno apenas.
+1. [00-LEIA-ME-PRIMEIRO.md](docs/00-LEIA-ME-PRIMEIRO.md)
+2. [01-REQUISITOS.md](docs/01-REQUISITOS.md)
+3. [02-ARQUITETURA.md](docs/02-ARQUITETURA.md)
+4. [03-BANCO-DE-DADOS.md](docs/03-BANCO-DE-DADOS.md)
+5. [04-API-LOCAL.md](docs/04-API-LOCAL.md)
+6. [05-LOGIN-E-USUARIOS.md](docs/05-LOGIN-E-USUARIOS.md)
+7. [06-DEPLOY-PORTAINER.md](docs/06-DEPLOY-PORTAINER.md)
+8. [07-TROUBLESHOOTING.md](docs/07-TROUBLESHOOTING.md)
+9. [08-MIGRACAO-SUPABASE.md](docs/08-MIGRACAO-SUPABASE.md)
+10. [09-BACKUP-RESTORE.md](docs/09-BACKUP-RESTORE.md)
 
----
+## Tecnologias
 
-**Última atualização**: Outubro 2026
+- React 18, Vite 5, React Flow, Tiptap, Recharts
+- FastAPI, psycopg2, JWT (python-jose)
+- PostgreSQL 15, PostgREST 12
+- MinIO (S3 local)
+- Nginx, Docker Compose
