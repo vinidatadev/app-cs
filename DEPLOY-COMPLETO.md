@@ -12,6 +12,7 @@
 POSTGRES_PASSWORD=uma_senha_forte
 MINIO_ACCESS_KEY=organograma
 MINIO_SECRET_KEY=uma_senha_forte_minimo_8_caracteres
+MINIO_SECURE=false
 SECRET_KEY=uma_chave_jwt_aleatoria_com_32_caracteres_ou_mais
 CORS_ORIGINS=http://IP_DO_SERVIDOR:3000
 ADMIN_EMAIL=admin@empresa.com

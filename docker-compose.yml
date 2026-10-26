@@ -72,7 +72,7 @@ services:
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin123}
-      MINIO_SECURE: "false"
+      MINIO_SECURE: ${MINIO_SECURE:-false}
       MINIO_BUCKETS: imagens,transacoes,task-attachments
       SEED_ASSETS_DIR: /app/seed-assets
       SEED_ASSETS_ON_START: "true"

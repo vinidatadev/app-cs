@@ -43,7 +43,7 @@ Aguarde alguns segundos e acesse:
 - PostgREST: http://localhost:3001
 - MinIO Console: http://localhost:9101 (minioadmin / minioadmin123 por padrão)
 
-Para usar um MinIO já existente no servidor, ajuste no `.env`: `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY` e `MINIO_SECRET_KEY`.
+Para usar um MinIO já existente no servidor, ajuste no `.env`: `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY` e, se for HTTPS, `MINIO_SECURE=true`.
 
 ## Login
 

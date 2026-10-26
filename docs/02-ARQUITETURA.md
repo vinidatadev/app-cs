@@ -36,7 +36,7 @@ Responsável por:
 
 Storage S3 local. Guarda fotos de perfil, imagens de transações e anexos de notas/tarefas nos buckets `imagens`, `transacoes` e `task-attachments`. O browser acessa os arquivos pelo proxy do backend, mantendo tudo na mesma origem (`/api/storage/public/...`). O console administrativo fica em `:9101`.
 
-Se a empresa já tiver um MinIO próprio, basta definir `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY` e `MINIO_SECRET_KEY` no `.env` apontando para ele. Se não quiser subir o MinIO local, remova o serviço `minio` e o volume `minio_data` do compose.
+Se a empresa já tiver um MinIO próprio, basta definir `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY` e `MINIO_SECURE` no `.env` apontando para ele. Se não quiser subir o MinIO local, remova o serviço `minio` e o volume `minio_data` do compose.
 
 ### PostgREST
 
