@@ -1,0 +1,79 @@
+===============================================
+DEPLOY NO PORTAINER - ORGANOGRAMA
+===============================================
+
+ARQUIVOS GERADOS:
+- organograma-dist.zip (apenas os arquivos compilados - 0.46 MB)
+- organograma-build.zip (código fonte para build no servidor)
+
+===============================================
+MÉTODO MAIS SIMPLES (RECOMENDADO)
+===============================================
+
+PASSO 1: No Portainer
+---------------------
+1. Vá em: Containers > Add Container
+2. Preencha:
+   - Name: organograma
+   - Image: nginx:alpine
+   
+3. Em "Port mapping":
+   - host: 3000
+   - container: 80
+   
+4. Em "Volumes":
+   - container: /usr/share/nginx/html
+   - Escolha "Bind"
+   - host: /opt/organograma
+   
+5. Clique em "Deploy the container"
+
+PASSO 2: No servidor (via SSH ou Console do Portainer)
+------------------------------------------------------
+1. Crie a pasta no servidor:
+   mkdir -p /opt/organograma
+
+2. Extraia o arquivo organograma-dist.zip para /opt/organograma
+
+3. Reinicie o container se necessário
+
+PRONTO! Acesse: http://ip-do-servidor:3000
+
+===============================================
+ALTERNATIVA: Se você tem acesso SSH ao servidor
+===============================================
+
+No servidor, rode estes comandos:
+
+# 1. Criar pasta
+mkdir -p /opt/organograma
+cd /opt/organograma
+
+# 2. Extrair o ZIP lá (faça upload via SFTP ou SCP)
+unzip organograma-dist.zip
+
+# 3. Build da imagem Docker
+docker build -t organograma:latest -f- . <<EOF
+FROM nginx:alpine
+COPY . /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+EOF
+
+# 4. Salvar como .tar
+docker save organograma:latest -o organograma-imagem.tar
+
+# 5. Depois faça upload do .tar no Portainer em: Images > Import
+
+===============================================
+TROUBLESHOOTING
+===============================================
+
+Se o container não subir:
+- Verifique os logs no Portainer
+- Certifique-se que a porta 3000 não está em uso
+- Verifique se o caminho /opt/organograma existe e tem os arquivos
+
+Se o Supabase não conectar:
+- Teste no navegador: https://kztzrejrhpsefvpugynq.supabase.co
+- Se não funcionar, será necessário usar Postgres local
