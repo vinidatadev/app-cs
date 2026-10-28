@@ -5,7 +5,7 @@ import GrupoAdmin from '../components/indicadores/GrupoAdmin'
 import RelatorioBiModal from '../components/indicadores/RelatorioBiModal'
 import { useIndicadores } from '../hooks/useIndicadores'
 import { useAuth } from '../context/AuthContext'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 export default function Indicadores() {
   const { isAdmin, user } = useAuth()
@@ -18,7 +18,7 @@ export default function Indicadores() {
 
   async function abrirModal(grupo = null) {
     if (!usersLoaded) {
-      const { data } = await supabase.from('user').select('id_user, nome_usuario, foto, cargo').order('nome_usuario')
+      const { data } = await api.from('user').select('id_user, nome_usuario, foto, cargo').order('nome_usuario')
       setUsers(data || [])
       setUsersLoaded(true)
     }
@@ -27,7 +27,7 @@ export default function Indicadores() {
 
   async function deletarGrupo(id) {
     if (!confirm('Excluir este grupo e todos os dados vinculados?')) return
-    await supabase.from('ind_grupo').delete().eq('id', id)
+    await api.from('ind_grupo').delete().eq('id', id)
     refresh()
   }
 

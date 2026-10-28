@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 const nivelOpcoes = [
   { value: 1, label: 'Diretor' },
@@ -24,14 +24,14 @@ export default function MembrosPanel({ users, relations, onClose, onRefresh }) {
   )
 
   async function adicionarAoOrganograma(userId) {
-    await supabase.from('organograma').insert({ id_user: userId, id_manager: null })
+    await api.from('organograma').insert({ id_user: userId, id_manager: null })
     onRefresh()
   }
 
   async function criarUser() {
     if (!form.nome_usuario.trim()) return
     setSaving(true)
-    const { data: newUser, error } = await supabase
+    const { data: newUser, error } = await api
       .from('user')
       .insert({ nome_usuario: form.nome_usuario, cargo: form.cargo, foto: form.foto || null, nivel: form.nivel })
       .select().single()

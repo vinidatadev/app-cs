@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '../../supabase'
+import { api } from '../../apiClient'
 import { useAuth } from '../../context/AuthContext'
 
 const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
@@ -23,8 +23,8 @@ export default function TarefaModal({ tarefa, grupo, onClose, onSave, users, can
 
   async function fetchDetalhes() {
     const [{ data: coms }, { data: anx }] = await Promise.all([
-      supabase.from('ind_tarefa_comentario').select('*').eq('id_tarefa', tarefa.id).order('criado_em'),
-      supabase.from('ind_tarefa_anexo').select('*').eq('id_tarefa', tarefa.id).order('criado_em'),
+      api.from('ind_tarefa_comentario').select('*').eq('id_tarefa', tarefa.id).order('criado_em'),
+      api.from('ind_tarefa_anexo').select('*').eq('id_tarefa', tarefa.id).order('criado_em'),
     ])
     setComentarios(coms || [])
     setAnexos(anx || [])
@@ -32,7 +32,7 @@ export default function TarefaModal({ tarefa, grupo, onClose, onSave, users, can
 
   async function salvarStatus(novoStatus) {
     setStatus(novoStatus)
-    await supabase.from('ind_tarefa').update({
+    await api.from('ind_tarefa').update({
       status: novoStatus, atualizado_em: new Date().toISOString(),
     }).eq('id', tarefa.id)
     onSave()
@@ -40,7 +40,7 @@ export default function TarefaModal({ tarefa, grupo, onClose, onSave, users, can
 
   async function enviarComentario(imagemUrl = null) {
     if (!novoComentario.trim() && !imagemUrl) return
-    await supabase.from('ind_tarefa_comentario').insert({
+    await api.from('ind_tarefa_comentario').insert({
       id_tarefa: tarefa.id,
       texto: novoComentario.trim() || '📎 Arquivo anexado',
       autor_id: user.id_user,
@@ -54,10 +54,10 @@ export default function TarefaModal({ tarefa, grupo, onClose, onSave, users, can
     const isImage = file.type.startsWith('image/')
     const ext = file.name.split('.').pop()
     const path = `indicadores/tarefas/${tarefa.id}/${Date.now()}.${ext}`
-    const { data, error } = await supabase.storage.from('task-attachments').upload(path, file, { upsert: true })
+    const { data, error } = await api.storage.from('task-attachments').upload(path, file, { upsert: true })
     if (error) return
-    const { data: urlData } = supabase.storage.from('task-attachments').getPublicUrl(data.path)
-    await supabase.from('ind_tarefa_anexo').insert({
+    const { data: urlData } = api.storage.from('task-attachments').getPublicUrl(data.path)
+    await api.from('ind_tarefa_anexo').insert({
       id_tarefa: tarefa.id, nome: file.name,
       url: urlData.publicUrl, tipo: isImage ? 'imagem' : 'arquivo',
     })

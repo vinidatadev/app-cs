@@ -4,7 +4,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 import Image from '@tiptap/extension-image'
-import { supabase } from '../../supabase'
+import { api } from '../../apiClient'
 import { useAuth } from '../../context/AuthContext'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
@@ -64,7 +64,7 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit, 
 
   async function fetchNotas() {
     const { data, error } = await escopo(
-      supabase.from('ind_nota').select('*, ind_nota_anexo(*)')
+      api.from('ind_nota').select('*, ind_nota_anexo(*)')
     ).order('criado_em', { ascending: false })
 
     if (error) {
@@ -88,7 +88,7 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit, 
     setSaving(true)
     setErro('')
     const html = editor.getHTML()
-    const { error } = await supabase.from('ind_nota').update({
+    const { error } = await api.from('ind_nota').update({
       conteudo_html: html,
       titulo: tituloAtivo || notaAtiva.titulo,
       atualizado_em: new Date().toISOString(),
@@ -104,7 +104,7 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit, 
   async function arquivarAtivas() {
     // Arquiva todas as notas ainda ativas do mesmo escopo
     for (const n of notas.filter(x => x.status === 'ativa')) {
-      const { error } = await supabase.from('ind_nota')
+      const { error } = await api.from('ind_nota')
         .update({ status: 'arquivada', atualizado_em: new Date().toISOString() })
         .eq('id', n.id)
       if (error) return error.message
@@ -120,7 +120,7 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit, 
       return
     }
 
-    const { error } = await supabase.from('ind_nota').insert({
+    const { error } = await api.from('ind_nota').insert({
       referencia,
       id_grupo: idGrupo || null,
       id_subgrupo: idSubgrupo || null,
@@ -150,13 +150,13 @@ export default function NotasEditor({ referencia, idGrupo, idSubgrupo, canEdit, 
     const isImage = file.type.startsWith('image/')
     const ext = file.name.split('.').pop()
     const path = `indicadores/notas/${notaAtiva.id}/${Date.now()}.${ext}`
-    const { data, error } = await supabase.storage.from('task-attachments').upload(path, file, { upsert: true })
+    const { data, error } = await api.storage.from('task-attachments').upload(path, file, { upsert: true })
     if (error) {
       setErro(error.message)
       return
     }
-    const { data: urlData } = supabase.storage.from('task-attachments').getPublicUrl(data.path)
-    const { error: erroAnexo } = await supabase.from('ind_nota_anexo').insert({
+    const { data: urlData } = api.storage.from('task-attachments').getPublicUrl(data.path)
+    const { error: erroAnexo } = await api.from('ind_nota_anexo').insert({
       id_nota: notaAtiva.id, nome: file.name,
       url: urlData.publicUrl, tipo: isImage ? 'imagem' : 'arquivo',
     })

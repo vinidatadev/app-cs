@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import TransacaoModal from '../components/TransacaoModal'
@@ -19,8 +19,8 @@ export default function Transacoes() {
   async function fetchTransacoes() {
     setLoading(true)
     const [{ data: tData }, { data: uData }] = await Promise.all([
-      supabase.from('transacao').select('*, ponto_focal:id_ponto_focal(id, nome_usuario, cargo, foto)').order('created_at', { ascending: false }),
-      supabase.from('user').select('id, nome_usuario, cargo, foto'),
+      api.from('transacao').select('*, ponto_focal:id_ponto_focal(id, nome_usuario, cargo, foto)').order('created_at', { ascending: false }),
+      api.from('user').select('id, nome_usuario, cargo, foto'),
     ])
     setTransacoes(tData || [])
     setUsers(uData || [])
@@ -124,7 +124,7 @@ export default function Transacoes() {
         <TransacaoModal
           onClose={() => setCriando(false)}
           onSave={async (form) => {
-            const { data } = await supabase.from('transacao').insert(form).select().single()
+            const { data } = await api.from('transacao').insert(form).select().single()
             setCriando(false)
             fetchTransacoes()
             if (data) setSelecionada(data)
@@ -139,7 +139,7 @@ export default function Transacoes() {
           canEdit={canEdit}
           onClose={() => { setSelecionada(null); fetchTransacoes() }}
           onDelete={canEdit ? async () => {
-            await supabase.from('transacao').delete().eq('id', selecionada.id)
+            await api.from('transacao').delete().eq('id', selecionada.id)
             setSelecionada(null)
             fetchTransacoes()
           } : null}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 
@@ -22,8 +22,8 @@ export default function AdminUsuarios() {
   async function fetchData() {
     setLoading(true)
     const [{ data: usersData }, { data: permData }] = await Promise.all([
-      supabase.from('user').select('id, id_user, nome_usuario, cargo, foto, nivel').order('nome_usuario'),
-      supabase.from('user_permissoes').select('*'),
+      api.from('user').select('id, id_user, nome_usuario, cargo, foto, nivel').order('nome_usuario'),
+      api.from('user_permissoes').select('*'),
     ])
 
     const permMap = {}
@@ -50,7 +50,7 @@ export default function AdminUsuarios() {
     if (!id_user) return
     setSaving(id_user)
     const perm = getPerm(id_user)
-    await supabase.from('user_permissoes').upsert({
+    await api.from('user_permissoes').upsert({
       id_user,
       organograma: perm.organograma,
       transacoes:  perm.transacoes,

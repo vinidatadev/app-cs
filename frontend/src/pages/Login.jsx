@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ export default function Login() {
     setLoading(true)
     setErro('')
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
+    const { error } = await api.auth.signInWithPassword({ email, password: senha })
 
     if (error) {
       setErro('E-mail ou senha incorretos.')

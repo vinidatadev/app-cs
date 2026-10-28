@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 const CORES = [
   '#6366f1', '#3b82f6', '#22c55e', '#a855f7', '#f97316',
@@ -17,7 +17,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.from('user_atribuicao').select('*, atribuicao(*)')
+      const { data } = await api.from('user_atribuicao').select('*, atribuicao(*)')
       const map = {}
       ;(data || []).forEach(ua => {
         if (!map[ua.id_user]) map[ua.id_user] = []
@@ -31,7 +31,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
   async function criarAtribuicao() {
     if (!novaAtrib.nome.trim()) return
     setSaving(true)
-    const { data, error } = await supabase
+    const { data, error } = await api
       .from('atribuicao')
       .insert({ nome: novaAtrib.nome.trim(), cor: novaAtrib.cor })
       .select().single()
@@ -43,7 +43,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
   }
 
   async function deletarAtribuicao(id) {
-    await supabase.from('atribuicao').delete().eq('id', id)
+    await api.from('atribuicao').delete().eq('id', id)
     setAtribuicoes(prev => prev.filter(a => a.id !== id))
     // remove do map local também
     setUserAtrib(prev => {
@@ -59,7 +59,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
     if (!userSelecionado) return
     const jatem = (userAtrib[userSelecionado.id] || []).find(a => a.id === atrib.id)
     if (jatem) return
-    await supabase.from('user_atribuicao').insert({ id_user: userSelecionado.id, id_atribuicao: atrib.id })
+    await api.from('user_atribuicao').insert({ id_user: userSelecionado.id, id_atribuicao: atrib.id })
     setUserAtrib(prev => ({
       ...prev,
       [userSelecionado.id]: [...(prev[userSelecionado.id] || []), atrib],
@@ -68,7 +68,7 @@ export default function AtribuicoesModal({ users, atribuicoes: initialAtrib, onC
   }
 
   async function removerAtribuicaoUser(id_user, id_atribuicao) {
-    await supabase.from('user_atribuicao').delete().eq('id_user', id_user).eq('id_atribuicao', id_atribuicao)
+    await api.from('user_atribuicao').delete().eq('id_user', id_user).eq('id_atribuicao', id_atribuicao)
     setUserAtrib(prev => ({
       ...prev,
       [id_user]: (prev[id_user] || []).filter(a => a.id !== id_atribuicao),

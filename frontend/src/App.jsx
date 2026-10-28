@@ -6,7 +6,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
-import { supabase } from './supabase'
+import { api } from './apiClient'
 import { useAuth } from './context/AuthContext'
 import UserNode from './components/UserNode'
 import Toolbar from './components/Toolbar'
@@ -93,10 +93,10 @@ export default function App() {
         { data: atribData },
         { data: userAtribData },
       ] = await Promise.all([
-        supabase.from('user').select('*'),
-        supabase.from('organograma').select('*'),
-        supabase.from('atribuicao').select('*'),
-        supabase.from('user_atribuicao').select('*, atribuicao(*)'),
+        api.from('user').select('*'),
+        api.from('organograma').select('*'),
+        api.from('atribuicao').select('*'),
+        api.from('user_atribuicao').select('*, atribuicao(*)'),
       ])
 
       if (usersError) console.error('Erro users:', usersError)
@@ -179,7 +179,7 @@ export default function App() {
     try {
       await Promise.all(
         nodes.map(n =>
-          supabase.from('organograma')
+          api.from('organograma')
             .update({ pos_x: n.position.x, pos_y: n.position.y })
             .eq('id_user', Number(n.id))
         )
@@ -193,7 +193,7 @@ export default function App() {
 
   const onConnect = useCallback(async (params) => {
     if (!canEdit) return
-    const { error } = await supabase.from('organograma').insert({
+    const { error } = await api.from('organograma').insert({
       id_user: Number(params.target),
       id_manager: Number(params.source),
     })
@@ -203,12 +203,12 @@ export default function App() {
   }, [setEdges, canEdit])
 
   async function handleRemove(userId) {
-    await supabase.from('organograma').delete().eq('id_user', userId)
+    await api.from('organograma').delete().eq('id_user', userId)
     await fetchData()
   }
 
   async function handleAddUser(form) {
-    const { data: newUser, error } = await supabase
+    const { data: newUser, error } = await api
       .from('user')
       .insert({ nome_usuario: form.nome_usuario, cargo: form.cargo, foto: form.foto || null, nivel: form.nivel })
       .select()
@@ -217,7 +217,7 @@ export default function App() {
     if (error || !newUser) return
 
     if (form.id_manager) {
-      await supabase.from('organograma').insert({
+      await api.from('organograma').insert({
         id_user: newUser.id,
         id_manager: Number(form.id_manager),
       })

@@ -26,6 +26,8 @@ Acesse http://localhost:3000.
 | Fazer deploy no servidor | [DEPLOY-COMPLETO.md](DEPLOY-COMPLETO.md) |
 | Resolver problemas | [docs/07-TROUBLESHOOTING.md](docs/07-TROUBLESHOOTING.md) |
 | Saber o que mudou do Supabase | [docs/08-MIGRACAO-SUPABASE.md](docs/08-MIGRACAO-SUPABASE.md) |
+| Migrar dados antigos | [docs/10-MIGRACAO-DADOS-SUPABASE.md](docs/10-MIGRACAO-DADOS-SUPABASE.md) |
+| Tutorial de implantação no servidor | [TUTORIAL-IMPLANTACAO.md](TUTORIAL-IMPLANTACAO.md) |
 
 ## Arquivos importantes
 

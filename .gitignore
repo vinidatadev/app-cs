@@ -8,3 +8,7 @@ dist
 
 backend/seed-assets/*
 !backend/seed-assets/README.md
+database/init/03-supabase-data.sql
+database/seed/
+deploy/*.tar
+deploy/*.tar.gz

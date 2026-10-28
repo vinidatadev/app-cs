@@ -3,7 +3,7 @@ import {
   ReactFlow, Background, BackgroundVariant, Controls,
   useNodesState, useEdgesState, addEdge,
 } from '@xyflow/react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 import CelulaNode from './CelulaNode'
 import CelulaModal from './CelulaModal'
 
@@ -26,9 +26,9 @@ export default function CelulaView({ users, canEdit = false }) {
       { data: celulaUsers },
       { data: relacoes },
     ] = await Promise.all([
-      supabase.from('celula').select('*'),
-      supabase.from('celula_user').select('*'),
-      supabase.from('celula_relacao').select('*'),
+      api.from('celula').select('*'),
+      api.from('celula_user').select('*'),
+      api.from('celula_relacao').select('*'),
     ])
 
     const c = celulaData || []
@@ -86,7 +86,7 @@ export default function CelulaView({ users, canEdit = false }) {
     saveTimer.current = setTimeout(async () => {
       await Promise.all(moved.map(c => {
         const celulaId = Number(c.id.replace('celula-', ''))
-        return supabase.from('celula').update({ pos_x: c.position.x, pos_y: c.position.y }).eq('id', celulaId)
+        return api.from('celula').update({ pos_x: c.position.x, pos_y: c.position.y }).eq('id', celulaId)
       }))
     }, 600)
   }, [onNodesChange, canEdit])
@@ -97,7 +97,7 @@ export default function CelulaView({ users, canEdit = false }) {
     await Promise.all(deletedEdges.map(edge => {
       const origemId = Number(edge.source.replace('celula-', ''))
       const destinoId = Number(edge.target.replace('celula-', ''))
-      return supabase.from('celula_relacao').delete().eq('id_origem', origemId).eq('id_destino', destinoId)
+      return api.from('celula_relacao').delete().eq('id_origem', origemId).eq('id_destino', destinoId)
     }))
   }, [canEdit])
 
@@ -106,7 +106,7 @@ export default function CelulaView({ users, canEdit = false }) {
     if (!canEdit) return
     const origemId = Number(params.source.replace('celula-', ''))
     const destinoId = Number(params.target.replace('celula-', ''))
-    const { error } = await supabase.from('celula_relacao').insert({ id_origem: origemId, id_destino: destinoId })
+    const { error } = await api.from('celula_relacao').insert({ id_origem: origemId, id_destino: destinoId })
     if (!error) {
       setEdges(eds => addEdge({ ...params, animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } }, eds))
     }
@@ -114,12 +114,12 @@ export default function CelulaView({ users, canEdit = false }) {
 
   async function handleSaveCelula({ id, nome, cor, descricao, membros }) {
     if (id) {
-      await supabase.from('celula').update({ nome, cor, descricao }).eq('id', id)
+      await api.from('celula').update({ nome, cor, descricao }).eq('id', id)
     } else {
-      const { data: nova } = await supabase.from('celula').insert({ nome, cor, descricao }).select().single()
+      const { data: nova } = await api.from('celula').insert({ nome, cor, descricao }).select().single()
       if (nova && membros?.length) {
         await Promise.all(membros.map(uid =>
-          supabase.from('celula_user').insert({ id_celula: nova.id, id_user: uid })
+          api.from('celula_user').insert({ id_celula: nova.id, id_user: uid })
         ))
       }
     }
@@ -133,7 +133,7 @@ export default function CelulaView({ users, canEdit = false }) {
     await Promise.all(
       nodes.map(n => {
         const celulaId = Number(n.id.replace('celula-', ''))
-        return supabase.from('celula').update({ pos_x: n.position.x, pos_y: n.position.y }).eq('id', celulaId)
+        return api.from('celula').update({ pos_x: n.position.x, pos_y: n.position.y }).eq('id', celulaId)
       })
     )
     setSaving(false)

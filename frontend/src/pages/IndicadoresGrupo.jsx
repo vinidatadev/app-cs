@@ -9,7 +9,7 @@ import GrupoAdmin from '../components/indicadores/GrupoAdmin'
 import RelatorioBiModal from '../components/indicadores/RelatorioBiModal'
 import { useGrupoData } from '../hooks/useIndicadores'
 import { useAuth } from '../context/AuthContext'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 const ANO_ATUAL = new Date().getFullYear()
 const ANOS = Array.from({ length: 5 }, (_, i) => ANO_ATUAL - 2 + i)
@@ -28,7 +28,7 @@ export default function IndicadoresGrupo() {
   const { grupo, valores, comentarios, users, loading, refresh } = useGrupoData(Number(id), ano)
 
   useEffect(() => {
-    supabase.from('user').select('id_user, nome_usuario, foto, cargo').order('nome_usuario')
+    api.from('user').select('id_user, nome_usuario, foto, cargo').order('nome_usuario')
       .then(({ data }) => setUsersGlobal(data || []))
   }, [])
 

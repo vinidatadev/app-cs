@@ -21,7 +21,7 @@ Browser
 
 ### Frontend
 
-React + Vite. O arquivo `src/supabase.js` foi substituído por um client local que mantém a mesma interface usada pelos componentes (`from`, `select`, `insert`, `update`, `delete`, `upsert`, `auth`, `storage`).
+React + Vite. O arquivo `src/apiClient.js` é o client local que mantém a mesma interface usada pelos componentes (`from`, `select`, `insert`, `update`, `delete`, `upsert`, `auth`, `storage`).
 
 ### Backend FastAPI
 
@@ -45,6 +45,18 @@ Transforma as tabelas do PostgreSQL em API REST. É o equivalente ao endpoint `/
 ### PostgreSQL
 
 Fonte única de verdade dos dados relacionais. O schema é criado por `database/init/01-schema.sql` e os dados migrados por `02-seed.sql`. Arquivos binários não ficam no banco: ficam no MinIO.
+
+## Fluxo das requisições do frontend
+
+Todas as chamadas passam pela API local:
+
+| Origem no frontend | Destino | Resultado |
+|---|---|---|
+| `api.from(...)` | `/rest/v1` → PostgREST | CRUD no PostgreSQL |
+| `api.auth...` | `/api/auth` → FastAPI | login, sessão e logout |
+| `api.storage...` | `/api/storage` → FastAPI | upload/download no MinIO |
+
+Não existe chamada para `supabase.co` no runtime.
 
 ## Fluxo de autenticação
 

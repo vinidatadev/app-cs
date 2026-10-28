@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 export default function TransacaoDetalhe({ transacao: transacaoInicial, users = [], onClose, onDelete, canEdit = false }) {
   const [transacao, setTransacao] = useState(transacaoInicial)
@@ -16,7 +16,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
   const pontoFocal = transacao.ponto_focal || null
 
   async function fetchDetalhes() {
-    const { data } = await supabase.from('transacao_detalhe').select('*')
+    const { data } = await api.from('transacao_detalhe').select('*')
       .eq('id_transacao', transacao.id).order('ordem', { ascending: true })
     setDetalhes(data || [])
   }
@@ -24,7 +24,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
   useEffect(() => { fetchDetalhes() }, [transacao.id])
 
   async function saveDesc() {
-    const { data } = await supabase.from('transacao')
+    const { data } = await api.from('transacao')
       .update({ descricao: draftDesc })
       .eq('id', transacao.id)
       .select('*, ponto_focal:id_ponto_focal(id, nome_usuario, cargo, foto)').single()
@@ -33,7 +33,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
   }
 
   async function savePontoFocal(userId) {
-    const { data } = await supabase.from('transacao')
+    const { data } = await api.from('transacao')
       .update({ id_ponto_focal: userId || null })
       .eq('id', transacao.id)
       .select('*, ponto_focal:id_ponto_focal(id, nome_usuario, cargo, foto)').single()
@@ -44,7 +44,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
 
   async function addTexto() {
     if (!novoTexto.trim()) return
-    await supabase.from('transacao_detalhe').insert({
+    await api.from('transacao_detalhe').insert({
       id_transacao: transacao.id, tipo: 'texto', conteudo: novoTexto.trim(), ordem: detalhes.length,
     })
     setNovoTexto(''); setAddingText(false); fetchDetalhes()
@@ -54,10 +54,10 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
     setUploading(true)
     const ext = file.name.split('.').pop()
     const path = `${transacao.id}/${Date.now()}.${ext}`
-    const { error } = await supabase.storage.from('transacoes').upload(path, file)
+    const { error } = await api.storage.from('transacoes').upload(path, file)
     if (!error) {
-      const { data: urlData } = supabase.storage.from('transacoes').getPublicUrl(path)
-      await supabase.from('transacao_detalhe').insert({
+      const { data: urlData } = api.storage.from('transacoes').getPublicUrl(path)
+      await api.from('transacao_detalhe').insert({
         id_transacao: transacao.id, tipo: 'imagem', conteudo: urlData.publicUrl, ordem: detalhes.length,
       })
       fetchDetalhes()
@@ -66,12 +66,12 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
   }
 
   async function deleteDetalhe(id) {
-    await supabase.from('transacao_detalhe').delete().eq('id', id)
+    await api.from('transacao_detalhe').delete().eq('id', id)
     fetchDetalhes()
   }
 
   async function saveDetalheTexto(id, conteudo) {
-    await supabase.from('transacao_detalhe').update({ conteudo }).eq('id', id)
+    await api.from('transacao_detalhe').update({ conteudo }).eq('id', id)
     fetchDetalhes()
   }
 
@@ -80,7 +80,7 @@ export default function TransacaoDetalhe({ transacao: transacaoInicial, users = 
     const target = index + dir
     if (target < 0 || target >= next.length) return
     ;[next[index], next[target]] = [next[target], next[index]]
-    await Promise.all(next.map((d, i) => supabase.from('transacao_detalhe').update({ ordem: i }).eq('id', d.id)))
+    await Promise.all(next.map((d, i) => api.from('transacao_detalhe').update({ ordem: i }).eq('id', d.id)))
     fetchDetalhes()
   }
 

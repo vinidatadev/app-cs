@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../../supabase'
+import { api } from '../../apiClient'
 import { useAuth } from '../../context/AuthContext'
 import CelulaInput from './CelulaInput'
 import { parseNumeroBR } from '../../utils/numeros'
@@ -49,7 +49,7 @@ export default function TabelaSubgrupo({ subgrupo, valores, ano, onUpdate, users
         // Célula apagada: remove o valor salvo (e comentários, via cascade)
         if (texto === '') {
           if (existingRow?.id) {
-            const { error } = await supabase.from('ind_valor').delete().eq('id', existingRow.id)
+            const { error } = await api.from('ind_valor').delete().eq('id', existingRow.id)
             if (error) erros.push(error.message)
           }
           return
@@ -62,14 +62,14 @@ export default function TabelaSubgrupo({ subgrupo, valores, ano, onUpdate, users
         }
 
         if (existingRow?.id) {
-          const { error } = await supabase.from('ind_valor').update({
+          const { error } = await api.from('ind_valor').update({
             valor: num,
             atualizado_em: new Date().toISOString(),
             atualizado_por: user.id_user,
           }).eq('id', existingRow.id)
           if (error) erros.push(error.message)
         } else {
-          const { error } = await supabase.from('ind_valor').insert({
+          const { error } = await api.from('ind_valor').insert({
             id_indicador: indId, ano, mes,
             valor: num, atualizado_por: user.id_user,
           })

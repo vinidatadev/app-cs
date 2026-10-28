@@ -100,7 +100,7 @@ docker exec -it organograma-postgres psql -U postgres -d organograma
 ```text
 app-cs/
 ├── frontend/              React + Vite + Nginx
-│   ├── src/supabase.js    client local compatível com as chamadas existentes
+│   ├── src/apiClient.js    client local compatível com as chamadas existentes
 │   └── nginx.conf         proxy /api e /rest/v1
 ├── backend/               FastAPI (auth + storage)
 │   ├── app/
@@ -124,6 +124,8 @@ app-cs/
 8. [07-TROUBLESHOOTING.md](docs/07-TROUBLESHOOTING.md)
 9. [08-MIGRACAO-SUPABASE.md](docs/08-MIGRACAO-SUPABASE.md)
 10. [09-BACKUP-RESTORE.md](docs/09-BACKUP-RESTORE.md)
+11. [10-MIGRACAO-DADOS-SUPABASE.md](docs/10-MIGRACAO-DADOS-SUPABASE.md)
+12. [TUTORIAL-IMPLANTACAO.md](TUTORIAL-IMPLANTACAO.md)
 
 ## Tecnologias
 

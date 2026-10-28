@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { supabase } from '../../supabase'
+import { api } from '../../apiClient'
 import { useAuth } from '../../context/AuthContext'
 import { formatNumeroBR } from '../../utils/numeros'
 
@@ -43,7 +43,7 @@ export default function CelulaInput({
 
   useEffect(() => {
     if (showComment && valorRow?.id && !hasLoadedComments) {
-      supabase.from('ind_comentario')
+      api.from('ind_comentario')
         .select('*').eq('id_valor', valorRow.id)
         .order('criado_em', { ascending: true })
         .then(({ data }) => { setComentarios(data || []); setHasLoadedComments(true) })
@@ -64,7 +64,7 @@ export default function CelulaInput({
   const isDirty = localValue !== undefined && String(localValue) !== String(savedVal ?? '')
 
   async function reloadComentarios(vId) {
-    const { data } = await supabase.from('ind_comentario')
+    const { data } = await api.from('ind_comentario')
       .select('*').eq('id_valor', vId).order('criado_em', { ascending: true })
     setComentarios(data || [])
     setHasLoadedComments(true)
@@ -74,7 +74,7 @@ export default function CelulaInput({
     if (!novoComentario.trim() && !imagemUrl) return
     const vId = valorRow?.id
     if (!vId) return
-    await supabase.from('ind_comentario').insert({
+    await api.from('ind_comentario').insert({
       id_valor: vId,
       texto: novoComentario.trim() || 'Imagem anexada',
       autor_id: user.id_user,
@@ -89,9 +89,9 @@ export default function CelulaInput({
     setUploadingImg(true)
     const ext = file.name.split('.').pop()
     const path = `indicadores/comentarios/${valorRow?.id || 'sem-id'}/${Date.now()}.${ext}`
-    const { data, error } = await supabase.storage.from('task-attachments').upload(path, file, { upsert: true })
+    const { data, error } = await api.storage.from('task-attachments').upload(path, file, { upsert: true })
     if (!error) {
-      const { data: urlData } = supabase.storage.from('task-attachments').getPublicUrl(data.path)
+      const { data: urlData } = api.storage.from('task-attachments').getPublicUrl(data.path)
       await sendComment(urlData.publicUrl)
     }
     setUploadingImg(false)

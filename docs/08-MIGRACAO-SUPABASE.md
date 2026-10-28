@@ -9,7 +9,7 @@ A documentação anterior afirmava que o frontend já havia sido adaptado para u
 1. O schema real do frontend foi reconstruído em `database/init/01-schema.sql`.
 2. Os dados visíveis pela chave `anon` foram exportados e gravados em `02-seed.sql`.
 3. Foi adicionado PostgREST para manter a semântica de queries do Supabase (`select`, `eq`, `in`, `order`, embeds).
-4. O arquivo `frontend/src/supabase.js` virou um client local compatível; os componentes não precisaram ser reescritos.
+4. O arquivo `frontend/src/apiClient.js` é o client local compatível; os componentes não precisaram ser reescritos.
 5. Login e Storage foram implementados no backend FastAPI, usando MinIO como storage S3 local.
 6. As fotos de perfil foram baixadas para `backend/seed-assets/` e enviadas para o bucket `imagens` do MinIO no startup. Essa pasta não é versionada por conter dados pessoais; use `mc mirror` para copiar entre MinIOs.
 7. O Supabase foi removido do `package.json`, do build e do fluxo de arquivos.

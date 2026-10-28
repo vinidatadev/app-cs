@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 export function useIndicadores() {
   const [grupos, setGrupos] = useState([])
@@ -7,7 +7,7 @@ export function useIndicadores() {
 
   const fetchGrupos = useCallback(async () => {
     setLoading(true)
-    const { data } = await supabase
+    const { data } = await api
       .from('ind_grupo')
       .select(`*, ind_subgrupo(*, ind_indicador(*))`)
       .order('ordem')
@@ -32,12 +32,12 @@ export function useGrupoData(grupoId, ano) {
     setLoading(true)
 
     const [{ data: grupoData }, { data: usersData }] = await Promise.all([
-      supabase
+      api
         .from('ind_grupo')
         .select(`*, ind_subgrupo(*, ind_indicador(*))`)
         .eq('id', grupoId)
         .single(),
-      supabase.from('user').select('id_user, nome_usuario, foto, cargo'),
+      api.from('user').select('id_user, nome_usuario, foto, cargo'),
     ])
 
     setGrupo(grupoData)
@@ -52,7 +52,7 @@ export function useGrupoData(grupoId, ano) {
 
     if (indIds.length === 0) { setLoading(false); return }
 
-    const { data: valoresData } = await supabase
+    const { data: valoresData } = await api
       .from('ind_valor')
       .select('*')
       .in('id_indicador', indIds)
@@ -69,7 +69,7 @@ export function useGrupoData(grupoId, ano) {
     // Buscar comentários de todos os valores
     const valorIds = (valoresData || []).map(v => v.id)
     if (valorIds.length > 0) {
-      const { data: comsData } = await supabase
+      const { data: comsData } = await api
         .from('ind_comentario')
         .select('*')
         .in('id_valor', valorIds)

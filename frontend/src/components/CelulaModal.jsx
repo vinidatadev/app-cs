@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 const CORES = [
   '#6366f1', '#3b82f6', '#22c55e', '#a855f7', '#f97316',
@@ -19,7 +19,7 @@ export default function CelulaModal({ celula, users, onClose, onSave }) {
 
   useEffect(() => {
     if (!editing) return
-    supabase.from('celula_user').select('id_user').eq('id_celula', celula.id).then(({ data }) => {
+    api.from('celula_user').select('id_user').eq('id_celula', celula.id).then(({ data }) => {
       setMembros((data || []).map(r => r.id_user))
     })
   }, [])
@@ -40,10 +40,10 @@ export default function CelulaModal({ celula, users, onClose, onSave }) {
       return
     }
     if (membros.includes(userId)) {
-      await supabase.from('celula_user').delete().eq('id_celula', celula.id).eq('id_user', userId)
+      await api.from('celula_user').delete().eq('id_celula', celula.id).eq('id_user', userId)
       setMembros(prev => prev.filter(id => id !== userId))
     } else {
-      await supabase.from('celula_user').insert({ id_celula: celula.id, id_user: userId })
+      await api.from('celula_user').insert({ id_celula: celula.id, id_user: userId })
       setMembros(prev => [...prev, userId])
     }
   }

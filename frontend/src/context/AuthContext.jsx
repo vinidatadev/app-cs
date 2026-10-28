@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 
 const AuthContext = createContext(null)
 
@@ -16,8 +16,8 @@ export function AuthProvider({ children }) {
     }
 
     const [{ data: userData }, { data: permData }] = await Promise.all([
-      supabase.from('user').select('*').eq('id_user', authUser.id).single(),
-      supabase.from('user_permissoes').select('*').eq('id_user', authUser.id).maybeSingle(),
+      api.from('user').select('*').eq('id_user', authUser.id).single(),
+      api.from('user_permissoes').select('*').eq('id_user', authUser.id).maybeSingle(),
     ])
 
     setUser(userData || null)
@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
     let mounted = true
 
     async function init() {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session } } = await api.auth.getSession()
       if (mounted) {
         await fetchUserData(session?.user ?? null)
         setLoading(false)
@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
 
     init()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = api.auth.onAuthStateChange((_event, session) => {
       if (mounted) fetchUserData(session?.user ?? null)
     })
 
@@ -48,15 +48,15 @@ export function AuthProvider({ children }) {
   }, [])
 
   const logout = async () => {
-    await supabase.auth.signOut()
+    await api.auth.signOut()
     setUser(null)
     setPermissoes(null)
   }
 
   async function refreshUser() {
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { session } } = await api.auth.getSession()
     if (session?.user) {
-      const { data } = await supabase.from('user').select('*').eq('id_user', session.user.id).single()
+      const { data } = await api.from('user').select('*').eq('id_user', session.user.id).single()
       setUser(data || null)
     }
   }

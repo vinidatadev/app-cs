@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../../supabase'
+import { api } from '../../apiClient'
 import { useAuth } from '../../context/AuthContext'
 import TarefaModal from './TarefaModal'
 
@@ -28,7 +28,7 @@ export default function TarefasPanel({ grupo, subgrupos, indicadores, users, can
 
   async function fetchTarefas() {
     if (!grupo?.id) return
-    const { data } = await supabase
+    const { data } = await api
       .from('ind_tarefa')
       .select('*, ind_subgrupo(nome), ind_indicador(nome)')
       .eq('id_grupo', grupo.id)
@@ -42,7 +42,7 @@ export default function TarefasPanel({ grupo, subgrupos, indicadores, users, can
 
   async function criarTarefa() {
     if (!form.titulo.trim()) return
-    await supabase.from('ind_tarefa').insert({
+    await api.from('ind_tarefa').insert({
       titulo: form.titulo,
       descricao: form.descricao || null,
       id_grupo: grupo.id,

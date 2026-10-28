@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../../supabase'
+import { api } from '../../apiClient'
 
 const CATEGORIAS = [
   'Melhoria Contínua e Processos',
@@ -52,13 +52,13 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
     if (!form.curso.trim()) return
     setSaving(true)
     if (modal.mode === 'criar') {
-      await supabase.from('curso').insert({
+      await api.from('curso').insert({
         curso: form.curso, descricao: form.descricao, conteudo: form.conteudo,
         carga_horaria: form.carga_horaria, categoria: form.categoria,
         nivel: form.nivel, link: form.link || null, ativo: form.ativo,
       })
     } else {
-      await supabase.from('curso').update({
+      await api.from('curso').update({
         curso: form.curso, descricao: form.descricao, conteudo: form.conteudo,
         carga_horaria: form.carga_horaria, categoria: form.categoria,
         nivel: form.nivel, link: form.link || null, ativo: form.ativo,
@@ -70,13 +70,13 @@ export default function GerenciarCursos({ cursos, onRefresh }) {
   }
 
   async function handleDelete(id) {
-    await supabase.from('curso').delete().eq('id', id)
+    await api.from('curso').delete().eq('id', id)
     setConfirmDelete(null)
     onRefresh()
   }
 
   async function toggleAtivo(curso) {
-    await supabase.from('curso').update({ ativo: !curso.ativo }).eq('id', curso.id)
+    await api.from('curso').update({ ativo: !curso.ativo }).eq('id', curso.id)
     onRefresh()
   }
 

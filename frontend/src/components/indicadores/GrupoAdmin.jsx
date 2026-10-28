@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../../supabase'
+import { api } from '../../apiClient'
 
 const CORES = ['#6366f1','#3b82f6','#22c55e','#f97316','#ec4899','#14b8a6','#f59e0b','#ef4444']
 const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
@@ -73,23 +73,23 @@ export default function GrupoAdmin({ grupo, users, onClose, onSave }) {
     try {
       let gId = grupo?.id
       if (!gId) {
-        const { data } = await supabase.from('ind_grupo')
+        const { data } = await api.from('ind_grupo')
           .insert({ nome: nome.trim(), descricao, ordem: 0 }).select().single()
         gId = data.id
       } else {
-        await supabase.from('ind_grupo').update({ nome: nome.trim(), descricao }).eq('id', gId)
+        await api.from('ind_grupo').update({ nome: nome.trim(), descricao }).eq('id', gId)
       }
 
       for (let si = 0; si < subgrupos.length; si++) {
         const s = subgrupos[si]
         let sId = s.id
         if (!sId) {
-          const { data } = await supabase.from('ind_subgrupo')
+          const { data } = await api.from('ind_subgrupo')
             .insert({ id_grupo: gId, nome: s.nome, responsavel_id: s.responsavel_id || null, ordem: si })
             .select().single()
           sId = data.id
         } else if (s._dirty) {
-          await supabase.from('ind_subgrupo')
+          await api.from('ind_subgrupo')
             .update({ nome: s.nome, responsavel_id: s.responsavel_id || null, ordem: si })
             .eq('id', sId)
         }
@@ -97,25 +97,25 @@ export default function GrupoAdmin({ grupo, users, onClose, onSave }) {
         // Deletar indicadores removidos (que tinham id mas não estão mais)
         const idsAtuais = s.ind_indicador.filter(i => i.id).map(i => i.id)
         if (sId && !s._new) {
-          const { data: existentes } = await supabase.from('ind_indicador')
+          const { data: existentes } = await api.from('ind_indicador')
             .select('id').eq('id_subgrupo', sId)
           const paraRemover = (existentes || []).filter(e => !idsAtuais.includes(e.id))
           for (const r of paraRemover) {
-            await supabase.from('ind_indicador').delete().eq('id', r.id)
+            await api.from('ind_indicador').delete().eq('id', r.id)
           }
         }
 
         for (let ii = 0; ii < s.ind_indicador.length; ii++) {
           const ind = s.ind_indicador[ii]
           if (!ind.id) {
-            await supabase.from('ind_indicador').insert({
+            await api.from('ind_indicador').insert({
               id_subgrupo: sId, nome: ind.nome, tipo: ind.tipo,
               tipo_grafico: ind.tipo_grafico || null,
               cor_grafico: ind.cor_grafico || null,
               painel_grafico: Number(ind.painel_grafico) || 1, ordem: ii,
             })
           } else {
-            await supabase.from('ind_indicador').update({
+            await api.from('ind_indicador').update({
               nome: ind.nome, tipo: ind.tipo,
               tipo_grafico: ind.tipo_grafico || null,
               cor_grafico: ind.cor_grafico || null,

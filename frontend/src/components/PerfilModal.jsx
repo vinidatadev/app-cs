@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 import { useAuth } from '../context/AuthContext'
 
 export default function PerfilModal({ onClose }) {
@@ -33,13 +33,13 @@ export default function PerfilModal({ onClose }) {
         const ext = file.name.split('.').pop()
         const path = `perfil/${user.id_user}.${ext}`
 
-        const { error: upErr } = await supabase.storage
+        const { error: upErr } = await api.storage
           .from('imagens')
           .upload(path, file, { upsert: true, contentType: file.type })
 
         if (upErr) throw upErr
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = api.storage
           .from('imagens')
           .getPublicUrl(path)
 
@@ -47,7 +47,7 @@ export default function PerfilModal({ onClose }) {
         fotoUrl = `${publicUrl}?t=${Date.now()}`
       }
 
-      const { error: dbErr } = await supabase
+      const { error: dbErr } = await api
         .from('user')
         .update({ nome_usuario: nome.trim(), foto: fotoUrl })
         .eq('id_user', user.id_user)

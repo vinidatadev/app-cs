@@ -377,7 +377,7 @@ function storageFrom(bucket) {
   }
 }
 
-export const supabase = {
+export const api = {
   from(table) {
     return new QueryBuilder(table)
   },

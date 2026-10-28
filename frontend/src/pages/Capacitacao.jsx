@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../supabase'
+import { api } from '../apiClient'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import CapacitacaoPorPessoa from '../components/capacitacao/PorPessoa'
@@ -22,9 +22,9 @@ export default function Capacitacao() {
   async function fetchAll() {
     setLoading(true)
     const [{ data: u }, { data: c }, { data: p }] = await Promise.all([
-      supabase.from('user').select('id, nome_usuario, cargo, foto, setor').order('nome_usuario'),
-      supabase.from('curso').select('*').eq('ativo', true).order('categoria').order('curso'),
-      supabase.from('user_curso').select('*'),
+      api.from('user').select('id, nome_usuario, cargo, foto, setor').order('nome_usuario'),
+      api.from('curso').select('*').eq('ativo', true).order('categoria').order('curso'),
+      api.from('user_curso').select('*'),
     ])
     const allUsers = u || []
     // extrai setores únicos pra montar o filtro
@@ -43,7 +43,7 @@ export default function Capacitacao() {
     : users.filter(u => u.setor === setorFiltro)
 
   async function setStatus(id_user, id_curso, status) {
-    await supabase.from('user_curso').upsert({ id_user, id_curso, status }, { onConflict: 'id_user,id_curso' })
+    await api.from('user_curso').upsert({ id_user, id_curso, status }, { onConflict: 'id_user,id_curso' })
     setProgressos(prev => {
       const exists = prev.find(p => p.id_user === id_user && p.id_curso === id_curso)
       if (exists) return prev.map(p => p.id_user === id_user && p.id_curso === id_curso ? { ...p, status } : p)
@@ -52,7 +52,7 @@ export default function Capacitacao() {
   }
 
   async function addCurso(id_user, id_curso) {
-    await supabase.from('user_curso').upsert({ id_user, id_curso, status: 'pendente' }, { onConflict: 'id_user,id_curso' })
+    await api.from('user_curso').upsert({ id_user, id_curso, status: 'pendente' }, { onConflict: 'id_user,id_curso' })
     setProgressos(prev => {
       if (prev.find(p => p.id_user === id_user && p.id_curso === id_curso)) return prev
       return [...prev, { id_user, id_curso, status: 'pendente' }]
@@ -60,7 +60,7 @@ export default function Capacitacao() {
   }
 
   async function removeCurso(id_user, id_curso) {
-    await supabase.from('user_curso').delete().eq('id_user', id_user).eq('id_curso', id_curso)
+    await api.from('user_curso').delete().eq('id_user', id_user).eq('id_curso', id_curso)
     setProgressos(prev => prev.filter(p => !(p.id_user === id_user && p.id_curso === id_curso)))
   }
 
