@@ -95,6 +95,22 @@ Acessar o banco:
 docker exec -it organograma-postgres psql -U postgres -d organograma
 ```
 
+## Pacotes de deploy
+
+```powershell
+# projeto completo (compose + database + docs)
+powershell -File scripts/build-deploy-tar.ps1
+
+# imagens separadas de frontend e backend
+powershell -File scripts/build-service-tars.ps1
+```
+
+Os arquivos são gerados em `deploy/`:
+
+- `organograma-deploy.tar` / `.tar.gz`
+- `organograma-backend.tar`
+- `organograma-frontend.tar`
+
 ## Estrutura
 
 ```text

@@ -57,6 +57,43 @@ Serão criados:
 
 O TAR contém `organograma/` com `frontend/`, `backend/`, `database/init/`, `docker-compose.yml`, scripts, docs e o `.env.example`. Ele inclui `backend/seed-assets/` para popular o MinIO, mas **não inclui** `.env` nem `node_modules`.
 
+### TARs separados (frontend e backend)
+
+Para criar duas imagens separadas, use:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-service-tars.ps1
+```
+
+Serão criados:
+
+- `deploy/organograma-backend.tar` — contexto do backend, Dockerfile na raiz, inclui `seed-assets`.
+- `deploy/organograma-frontend.tar` — contexto do frontend, Dockerfile na raiz, sem `node_modules`/`dist`.
+
+No Portainer:
+
+1. **Images → Build a new image**.
+2. Selecione **Upload** e envie `organograma-backend.tar`.
+3. Nome da imagem: `organograma-backend:latest`.
+4. Repita com `organograma-frontend.tar` e o nome `organograma-frontend:latest`.
+5. Use `deploy/portainer-stack.yml` para criar a stack.
+
+Via CLI no servidor:
+
+```bash
+docker build -t organograma-backend:latest - < organograma-backend.tar
+docker build -t organograma-frontend:latest - < organograma-frontend.tar
+```
+
+No PowerShell use:
+
+```powershell
+cmd /c "docker build -t organograma-backend:latest - < organograma-backend.tar"
+cmd /c "docker build -t organograma-frontend:latest - < organograma-frontend.tar"
+```
+
+Depois suba a stack com `deploy/portainer-stack.yml` (as imagens já estarão prontas).
+
 ## 4. Enviar e extrair no servidor
 
 Envie o TAR por SCP, WinSCP ou compartilhamento interno.
