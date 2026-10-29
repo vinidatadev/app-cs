@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.auth import router as auth_router
 from app.api.storage import ensure_storage, router as storage_router, storage_health
+from app.api.users import router as users_router
 from app.core.config import settings
 from app.core.database import get_cursor
 
@@ -24,6 +25,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(storage_router)
+app.include_router(users_router)
 
 
 def ensure_admin_account() -> None:
