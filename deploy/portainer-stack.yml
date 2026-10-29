@@ -1,28 +1,19 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: organograma-postgres
     environment:
       POSTGRES_DB: organograma
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres123}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init:/docker-entrypoint-initdb.d:ro
     ports:
       - "5432:5432"
     networks:
-      - organograma-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d organograma"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+      - app-net
 
   minio:
     image: minio/minio:latest
-    container_name: organograma-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
@@ -33,17 +24,10 @@ services:
       - "9100:9000"
       - "9101:9001"
     networks:
-      - organograma-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      - app-net
 
   postgrest:
     image: postgrest/postgrest:v12.2.3
-    container_name: organograma-postgrest
     environment:
       PGRST_DB_URI: postgres://authenticator:postgrest_local_pwd@postgres:5432/organograma
       PGRST_DB_SCHEMAS: public
@@ -53,61 +37,48 @@ services:
     ports:
       - "3001:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
-      - organograma-network
-    restart: unless-stopped
+      - app-net
 
   backend:
     image: organograma-backend:latest
-    container_name: organograma-backend
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres123}@postgres:5432/organograma
       SECRET_KEY: ${SECRET_KEY:-chave-secreta-jwt-local-minimo-32-caracteres}
       ACCESS_TOKEN_EXPIRE_MINUTES: 10080
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://10.0.103.20:3000}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin123}
       MINIO_SECURE: ${MINIO_SECURE:-false}
       MINIO_BUCKETS: imagens,transacoes,task-attachments
       SEED_ASSETS_DIR: /app/seed-assets
-      SEED_ASSETS_ON_START: "true"
+      SEED_ASSETS_ON_START: "false"
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@empresa.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
     ports:
       - "8000:8000"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
-      - organograma-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
+      - app-net
 
   frontend:
     image: organograma-frontend:latest
-    container_name: organograma-frontend
     ports:
       - "3000:80"
     depends_on:
       - backend
       - postgrest
     networks:
-      - organograma-network
-    restart: unless-stopped
+      - app-net
 
 volumes:
   postgres_data:
-    driver: local
   minio_data:
-    driver: local
 
 networks:
-  organograma-network:
-    driver: bridge
+  app-net:
+    driver: overlay
+    attachable: true

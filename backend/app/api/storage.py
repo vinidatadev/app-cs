@@ -64,10 +64,16 @@ def normalize_object_path(file_path: str) -> str:
 
 
 def ensure_storage() -> None:
+    # Se não há buckets configurados ou não é para fazer seed, pula a verificação do MinIO
+    buckets = configured_buckets()
+    if not buckets or not settings.SEED_ASSETS_ON_START:
+        logger.info("Inicialização do MinIO desabilitada (SEED_ASSETS_ON_START=%s)", settings.SEED_ASSETS_ON_START)
+        return
+    
     last_error: Exception | None = None
     for attempt in range(1, 31):
         try:
-            for bucket in configured_buckets():
+            for bucket in buckets:
                 ensure_bucket(bucket)
             if settings.SEED_ASSETS_ON_START:
                 seed_assets()

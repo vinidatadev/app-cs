@@ -24,6 +24,7 @@ Acesse http://localhost:3000.
 | Usar a API | [docs/04-API-LOCAL.md](docs/04-API-LOCAL.md) |
 | Entender login e contas | [docs/05-LOGIN-E-USUARIOS.md](docs/05-LOGIN-E-USUARIOS.md) |
 | Fazer deploy no servidor | [DEPLOY-COMPLETO.md](DEPLOY-COMPLETO.md) |
+| **📘 Deploy no Portainer (Docker Swarm)** | **[docs/INDEX-PORTAINER.md](docs/INDEX-PORTAINER.md)** ← Comece aqui para Portainer |
 | Resolver problemas | [docs/07-TROUBLESHOOTING.md](docs/07-TROUBLESHOOTING.md) |
 | Saber o que mudou do Supabase | [docs/08-MIGRACAO-SUPABASE.md](docs/08-MIGRACAO-SUPABASE.md) |
 | Migrar dados antigos | [docs/10-MIGRACAO-DADOS-SUPABASE.md](docs/10-MIGRACAO-DADOS-SUPABASE.md) |
