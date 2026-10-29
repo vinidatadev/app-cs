@@ -64,25 +64,40 @@ def normalize_object_path(file_path: str) -> str:
 
 
 def ensure_storage() -> None:
-    # Se não há buckets configurados ou não é para fazer seed, pula a verificação do MinIO
+    """
+    Inicialização lazy do storage.
+    Só verifica MinIO se SEED_ASSETS_ON_START=true.
+    Caso contrário, a conexão será feita sob demanda nos endpoints.
+    """
     buckets = configured_buckets()
     if not buckets or not settings.SEED_ASSETS_ON_START:
-        logger.info("Inicialização do MinIO desabilitada (SEED_ASSETS_ON_START=%s)", settings.SEED_ASSETS_ON_START)
+        logger.info(
+            "Inicialização do MinIO pulada (SEED_ASSETS_ON_START=%s). "
+            "Conexão será feita sob demanda nos endpoints de storage.",
+            settings.SEED_ASSETS_ON_START
+        )
         return
     
+    # Se SEED_ASSETS_ON_START=true, tenta conectar e fazer seed
     last_error: Exception | None = None
-    for attempt in range(1, 31):
+    for attempt in range(1, 11):  # Reduzido de 30 para 10 tentativas
         try:
             for bucket in buckets:
                 ensure_bucket(bucket)
-            if settings.SEED_ASSETS_ON_START:
-                seed_assets()
+            seed_assets()
+            logger.info("MinIO inicializado com sucesso e assets migrados")
             return
         except Exception as exc:
             last_error = exc
-            logger.warning("MinIO indisponível (tentativa %s/30): %s", attempt, exc)
+            logger.warning("MinIO indisponível (tentativa %s/10): %s", attempt, exc)
             time.sleep(2)
-    raise RuntimeError(f"Não foi possível inicializar o MinIO: {last_error}")
+    
+    # Não lança exceção, apenas avisa
+    logger.warning(
+        "Não foi possível conectar ao MinIO no startup: %s. "
+        "Os endpoints de storage tentarão conectar sob demanda.",
+        last_error
+    )
 
 
 def seed_assets() -> None:
@@ -122,6 +137,57 @@ def storage_health() -> bool:
         return False
 
 
+@router.get("/health")
+def storage_health_check():
+    """
+    Endpoint para verificar status do MinIO.
+    Retorna informações detalhadas sobre conectividade.
+    """
+    try:
+        buckets = configured_buckets()
+        if not buckets:
+            return {
+                "status": "disabled",
+                "message": "Nenhum bucket configurado",
+                "buckets": []
+            }
+        
+        client = get_client()
+        available_buckets = []
+        
+        for bucket in buckets:
+            try:
+                exists = client.bucket_exists(bucket)
+                available_buckets.append({
+                    "name": bucket,
+                    "exists": exists,
+                    "accessible": True
+                })
+            except Exception as e:
+                available_buckets.append({
+                    "name": bucket,
+                    "exists": False,
+                    "accessible": False,
+                    "error": str(e)
+                })
+        
+        all_accessible = all(b.get("accessible") for b in available_buckets)
+        
+        return {
+            "status": "ok" if all_accessible else "partial",
+            "endpoint": settings.MINIO_ENDPOINT,
+            "buckets": available_buckets,
+            "message": "MinIO acessível" if all_accessible else "Alguns buckets inacessíveis"
+        }
+    except Exception as exc:
+        return {
+            "status": "error",
+            "endpoint": settings.MINIO_ENDPOINT,
+            "message": f"Erro ao conectar: {str(exc)}",
+            "buckets": []
+        }
+
+
 @router.post("/{bucket}/{file_path:path}")
 async def upload(
     bucket: str,
@@ -129,6 +195,10 @@ async def upload(
     file: UploadFile = File(...),
     _user: dict = Depends(require_user),
 ):
+    """
+    Upload de arquivo para o MinIO.
+    Cria o bucket automaticamente se não existir.
+    """
     bucket = validate_bucket(bucket)
     object_name = normalize_object_path(file_path)
     data = await file.read()
@@ -137,7 +207,15 @@ async def upload(
     if not data:
         raise HTTPException(status_code=400, detail="Arquivo vazio")
 
-    ensure_bucket(bucket)
+    # Garante que o bucket existe (lazy initialization)
+    try:
+        ensure_bucket(bucket)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"MinIO indisponível. Verifique se o serviço está rodando: {str(exc)}"
+        ) from exc
+    
     content_type = file.content_type or mimetypes.guess_type(object_name)[0] or "application/octet-stream"
     try:
         get_client().put_object(
