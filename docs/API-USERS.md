@@ -341,6 +341,26 @@ curl http://IP:8000/api/users \
 
 ## 🎯 Integração com Frontend
 
+### Interface Web Disponível
+
+O sistema possui uma **interface administrativa completa** para gerenciamento de usuários.
+
+**Acessar:**
+1. Faça login como administrador (nivel=2)
+2. Acesse a aba "Admin" no menu superior
+3. Use o botão "+ Novo Usuário" para criar
+
+**Funcionalidades:**
+- Criar novo usuário com formulário visual
+- Editar dados de usuários existentes
+- Gerenciar permissões por módulo
+- Buscar usuários por nome ou cargo
+
+**Requisitos:**
+- Apenas usuários com `nivel = 2` têm acesso
+- Alterações são salvas diretamente no banco
+- Frontend e backend totalmente integrados
+
 ### Exemplo React/JavaScript
 
 ```javascript

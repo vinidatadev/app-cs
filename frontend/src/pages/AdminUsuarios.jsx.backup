@@ -1,0 +1,455 @@
+import { useEffect, useState } from 'react'
+import { api } from '../apiClient'
+import { useAuth } from '../context/AuthContext'
+import Navbar from '../components/Navbar'
+
+const PERMISSAO_OPTS = ['none', 'viewer', 'editor']
+
+export default function AdminUsuarios() {
+  const { isAdmin, user: currentUser } = useAuth()
+  const [users, setUsers] = useState([])
+  const [permissoes, setPermissoes] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(null)
+  const [busca, setBusca] = useState('')
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+
+  async function fetchData() {
+    setLoading(true)
+    try {
+      // Buscar usuários via API nova
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(data.users || [])
+      } else {
+        // Fallback para PostgREST se falhar
+        const { data } = await api.from('user').select('*').order('nome_usuario')
+        setUsers(data || [])
+      }
+      
+      const { data: permData } = await api.from('user_permissoes').select('*')
+      const permMap = {}
+      ;(permData || []).forEach(p => { permMap[p.id_user] = p })
+      setPermissoes(permMap)
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error)
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => { fetchData() }, [])
+
+  function getPerm(id_user) {
+    return permissoes[id_user] || { organograma: 'none', transacoes: 'none', capacitacao: 'none', links: false }
+  }
+
+  function setPermLocal(id_user, campo, valor) {
+    setPermissoes(prev => ({
+      ...prev,
+      [id_user]: { ...getPerm(id_user), [campo]: valor },
+    }))
+  }
+
+  async function salvarPerm(id_user) {
+    if (!id_user) return
+    setSaving(id_user)
+    const perm = getPerm(id_user)
+    await api.from('user_permissoes').upsert({
+      id_user,
+      organograma: perm.organograma,
+      transacoes:  perm.transacoes,
+      capacitacao: perm.capacitacao,
+      links:       perm.links,
+    }, { onConflict: 'id_user' })
+    setSaving(null)
+  }
+
+  async function deleteUser(userId) {
+    if (!confirm('Tem certeza que deseja deletar este usuário? Esta ação não pode ser desfeita.')) return
+    
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.detail || 'Erro ao deletar usuário')
+      }
+      
+      alert('Usuário deletado com sucesso!')
+      fetchData()
+    } catch (error) {
+      alert('Erro: ' + error.message)
+    }
+  }
+
+  const filtrados = users.filter(u =>
+    !busca ||
+    (u.nome_usuario || '').toLowerCase().includes(busca.toLowerCase()) ||
+    (u.cargo || '').toLowerCase().includes(busca.toLowerCase())
+  )
+
+  if (!isAdmin) {
+    return (
+      <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, minHeight: '100vh' }}>
+        <div style={{ fontSize: 44 }}>🔒</div>
+        <p style={{ color: 'var(--text2)', fontWeight: 700 }}>Acesso restrito a administradores</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="page" style={{ minHeight: '100vh' }}>
+      <Navbar />
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px 64px' }}>
+
+        <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.02em' }}>
+              ⚙️ Administração de Usuários
+            </h1>
+            <p style={{ fontSize: 13, color: 'var(--text5)', marginTop: 4 }}>
+              Criar, editar e gerenciar usuários e permissões.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            style={{
+              background: '#6366f1', border: 'none', color: 'white',
+              borderRadius: 10, padding: '10px 18px', fontSize: 14, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <span style={{ fontSize: 16 }}>+</span>
+            Novo Usuário
+          </button>
+        </div>
+
+        <input
+          value={busca}
+          onChange={e => setBusca(e.target.value)}
+          placeholder="🔍 Buscar por nome ou cargo..."
+          style={{
+            width: '100%', background: 'var(--bg3)', border: '1px solid var(--border)',
+            borderRadius: 12, padding: '11px 16px', color: 'var(--text)',
+            fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none',
+            boxSizing: 'border-box', marginBottom: 20,
+          }}
+        />
+
+        {loading ? (
+          <div style={{ textAlign: 'center', color: '#6366f1', padding: 64 }}>Carregando...</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {filtrados.map(u => {
+              const isNivel2 = u.nivel === 2
+              const perm = getPerm(u.id_user)
+              const isSaving = saving === u.id_user
+              const isCurrentUser = u.id_user === currentUser?.id_user
+
+              return (
+                <div key={u.id} style={{
+                  background: 'var(--bg2)', border: `1px solid ${isNivel2 ? '#6366f133' : 'var(--border)'}',
+                  borderRadius: 14, padding: '16px 20px',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 12 }}>
+                    {/* Info do usuário */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <Avatar user={u} />
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {u.nome_usuario || ('ID ' + u.id)}
+                          {isNivel2 && (
+                            <span style={{ fontSize: 10, color: '#6366f1', background: '#6366f118', border: '1px solid #6366f133', borderRadius: 20, padding: '2px 8px', fontWeight: 700 }}>
+                              admin
+                            </span>
+                          )}
+                          {!u.is_active && (
+                            <span style={{ fontSize: 10, color: '#ef4444', background: '#ef444418', border: '1px solid #ef444433', borderRadius: 20, padding: '2px 8px', fontWeight: 700 }}>
+                              inativo
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 12, color: 'var(--text4)', marginTop: 2 }}>
+                          {u.cargo || '—'} {u.setor && ('• ' + u.setor)}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--text5)', marginTop: 2 }}>
+                          Login: {u.username || '—'} • Email: {u.email || '—'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ações */}
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        onClick={() => setEditingUser(u)}
+                        style={{
+                          background: '#6366f122', border: '1px solid #6366f155', color: '#6366f1',
+                          borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700,
+                          cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
+                      {!isCurrentUser && (
+                        <button
+                          onClick={() => deleteUser(u.id)}
+                          style={{
+                            background: '#ef444422', border: '1px solid #ef444455', color: '#ef4444',
+                            borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700,
+                            cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                          }}
+                        >
+                          🗑️
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Permissões */}
+                  {u.id_user && (
+                    <div style={{ display: 'flex', gap: 12, paddingTop: 12, borderTop: '1px solid var(--border)', alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text5)', textTransform: 'uppercase' }}>Permissões:</span>
+                      <PermSelect label="Organograma" value={isNivel2 ? 'editor' : perm.organograma} disabled={isNivel2 || !u.id_user} onChange={v => setPermLocal(u.id_user, 'organograma', v)} />
+                      <PermSelect label="Transações" value={isNivel2 ? 'editor' : perm.transacoes} disabled={isNivel2 || !u.id_user} onChange={v => setPermLocal(u.id_user, 'transacoes', v)} />
+                      <PermSelect label="Capacitação" value={isNivel2 ? 'editor' : perm.capacitacao} disabled={isNivel2 || !u.id_user} onChange={v => setPermLocal(u.id_user, 'capacitacao', v)} />
+                      
+                      {!isNivel2 && u.id_user && (
+                        <button
+                          onClick={() => salvarPerm(u.id_user)}
+                          disabled={isSaving}
+                          style={{
+                            background: '#22c55e22', border: '1px solid #22c55e55', color: '#22c55e',
+                            borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700,
+                            cursor: isSaving ? 'not-allowed' : 'pointer',
+                            fontFamily: 'Inter, sans-serif', marginLeft: 'auto',
+                          }}
+                        >
+                          {isSaving ? '...' : '💾 Salvar Permissões'}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {showCreateModal && <UserModal onClose={() => { setShowCreateModal(false); fetchData() }} />}
+      {editingUser && <UserModal user={editingUser} onClose={() => { setEditingUser(null); fetchData() }} />}
+    </div>
+  )
+}
+
+function PermSelect({ label, value, disabled, onChange }) {
+  const colors = { none: '#475569', viewer: '#3b82f6', editor: '#22c55e' }
+  const color = colors[value] || '#475569'
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <span style={{ fontSize: 11, color: 'var(--text4)' }}>{label}:</span>
+      <select
+        value={value}
+        disabled={disabled}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          background: disabled ? '#0f0f17' : (color + '15'),
+          border: '1px solid ' + (disabled ? 'var(--border)' : color + '55'),
+          borderRadius: 6, padding: '4px 8px',
+          color: disabled ? '#475569' : color,
+          fontSize: 11, fontWeight: 700, cursor: disabled ? 'default' : 'pointer',
+          fontFamily: 'Inter, sans-serif', outline: 'none',
+        }}
+      >
+        {PERMISSAO_OPTS.map(o => (
+          <option key={o} value={o} style={{ background: 'var(--bg3)', color: 'var(--text)' }}>
+            {o === 'none' ? '—' : o === 'viewer' ? '👁 viewer' : '✏ editor'}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+function Avatar({ user }) {
+  const initials = (user.nome_usuario || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+  return (
+    <div style={{
+      width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+      background: '#312e81', border: '2px solid #6366f133',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+    }}>
+      {user.foto
+        ? <img src={user.foto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        : <span style={{ color: '#6366f1', fontWeight: 700, fontSize: 14 }}>{initials}</span>
+      }
+    </div>
+  )
+}
+
+function UserModal({ user, onClose }) {
+  const [form, setForm] = useState({
+    nome_usuario: user?.nome_usuario || '',
+    cargo: user?.cargo || '',
+    setor: user?.setor || '',
+    nivel: user?.nivel || 1,
+    username: user?.username || '',
+    email: user?.email || '',
+    password: '',
+  })
+  const [loading, setLoading] = useState(false)
+  const isEdit = !!user
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const token = localStorage.getItem('token')
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+      const url = isEdit
+        ? baseUrl + '/api/users/' + user.id
+        : baseUrl + '/api/users'
+      
+      const body = isEdit
+        ? { ...form, password: form.password || undefined } // Só envia senha se preenchida
+        : form
+
+      const response = await fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.detail || 'Erro ao salvar usuário')
+      }
+
+      alert(isEdit ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!')
+      onClose()
+    } catch (error) {
+      alert('Erro: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000,
+    }} onClick={onClose}>
+      <div style={{
+        background: 'var(--bg2)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 500,
+        maxHeight: '90vh', overflowY: 'auto',
+      }} onClick={e => e.stopPropagation()}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text2)', marginBottom: 20 }}>
+          {isEdit ? '✏️ Editar Usuário' : '➕ Novo Usuário'}
+        </h2>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Input label="Nome Completo" value={form.nome_usuario} onChange={v => setForm({...form, nome_usuario: v})} required />
+          <Input label="Cargo" value={form.cargo} onChange={v => setForm({...form, cargo: v})} required />
+          <Input label="Setor" value={form.setor} onChange={v => setForm({...form, setor: v})} />
+          
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text4)', display: 'block', marginBottom: 6 }}>Nível</label>
+            <select
+              value={form.nivel}
+              onChange={e => setForm({...form, nivel: parseInt(e.target.value)})}
+              style={{
+                width: '100%', background: 'var(--bg3)', border: '1px solid var(--border)',
+                borderRadius: 10, padding: '10px 12px', color: 'var(--text)',
+                fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none',
+              }}
+            >
+              <option value="1">1 - Usuário Comum</option>
+              <option value="2">2 - Administrador</option>
+            </select>
+          </div>
+
+          {!isEdit && (
+            <>
+              <Input label="Username (login)" value={form.username} onChange={v => setForm({...form, username: v})} required pattern="[a-z0-9._-]+" />
+              <Input label="Email" type="email" value={form.email} onChange={v => setForm({...form, email: v})} required />
+              <Input label="Senha" type="password" value={form.password} onChange={v => setForm({...form, password: v})} required minLength={6} />
+            </>
+          )}
+
+          {isEdit && (
+            <>
+              <Input label="Email" type="email" value={form.email} onChange={v => setForm({...form, email: v})} />
+              <Input label="Nova Senha (deixe vazio para não alterar)" type="password" value={form.password} onChange={v => setForm({...form, password: v})} minLength={6} />
+            </>
+          )}
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                flex: 1, background: '#6366f1', border: 'none', color: 'white',
+                borderRadius: 10, padding: '12px', fontSize: 14, fontWeight: 700,
+                cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              {loading ? '...' : (isEdit ? 'Salvar' : 'Criar Usuário')}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                flex: 1, background: 'var(--bg3)', border: '1px solid var(--border)', color: 'var(--text4)',
+                borderRadius: 10, padding: '12px', fontSize: 14, fontWeight: 700,
+                cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function Input({ label, value, onChange, type = 'text', required = false, minLength, pattern }) {
+  return (
+    <div>
+      <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text4)', display: 'block', marginBottom: 6 }}>
+        {label} {required && <span style={{ color: '#ef4444' }}>*</span>}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        required={required}
+        minLength={minLength}
+        pattern={pattern}
+        style={{
+          width: '100%', background: 'var(--bg3)', border: '1px solid var(--border)',
+          borderRadius: 10, padding: '10px 12px', color: 'var(--text)',
+          fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none',
+          boxSizing: 'border-box',
+        }}
+      />
+    </div>
+  )
+}

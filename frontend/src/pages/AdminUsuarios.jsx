@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../apiClient'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
+import CreateUserModal from '../components/CreateUserModal'
 
 const PERMISSAO_OPTS = ['none', 'viewer', 'editor']
 
@@ -18,6 +19,7 @@ export default function AdminUsuarios() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(null) // id_user sendo salvo
   const [busca, setBusca] = useState('')
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   async function fetchData() {
     setLoading(true)
@@ -80,13 +82,27 @@ export default function AdminUsuarios() {
       <Navbar />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '80px 24px 64px' }}>
 
-        <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.02em' }}>
-            ⚙ Administração de Usuários
-          </h1>
-          <p style={{ fontSize: 13, color: 'var(--text5)', marginTop: 4 }}>
-            Gerencie permissões de acesso por módulo. Usuários com nível 2 têm acesso total automaticamente.
-          </p>
+        <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text2)', letterSpacing: '-0.02em' }}>
+              ⚙ Administração de Usuários
+            </h1>
+            <p style={{ fontSize: 13, color: 'var(--text5)', marginTop: 4 }}>
+              Criar usuários e gerenciar permissões de acesso por módulo.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            style={{
+              background: '#6366f1', border: 'none', color: 'white',
+              borderRadius: 10, padding: '10px 18px', fontSize: 14, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              display: 'flex', alignItems: 'center', gap: 6
+            }}
+          >
+            <span style={{ fontSize: 16 }}>+</span>
+            Novo Usuário
+          </button>
         </div>
 
         <input
@@ -208,6 +224,16 @@ export default function AdminUsuarios() {
           </div>
         )}
       </div>
+
+      {showCreateModal && (
+        <CreateUserModal 
+          onClose={() => setShowCreateModal(false)} 
+          onSuccess={() => {
+            setShowCreateModal(false)
+            fetchData()
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -254,3 +280,4 @@ function Avatar({ user }) {
     </div>
   )
 }
+
